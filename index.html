@@ -211,6 +211,43 @@
                 padding: 0.75rem 0.5rem;
                 font-size: 0.875rem;
             }
+
+            .chip {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .exercise-card {
+                padding: 1rem;
+            }
+
+            .exercise-card .flex {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .exercise-card img,
+            .exercise-card .w-16 {
+                width: 100%;
+                height: auto;
+                max-height: 150px;
+                object-fit: cover;
+            }
+
+            .btn-primary {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            #workoutPlan .exercise-card .flex {
+                flex-direction: row;
+            }
+
+            #workoutPlan .exercise-card .flex .w-16 {
+                width: 4rem;
+                height: 4rem;
+                min-width: 4rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -225,6 +262,43 @@
 
             h1 {
                 font-size: 2.5rem;
+            }
+
+            .chip {
+                padding: 0.35rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .grid.grid-cols-2,
+            .grid.grid-cols-3,
+            .grid.grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .text-5xl,
+            .text-4xl {
+                font-size: 1.875rem;
+                line-height: 2.25rem;
+            }
+
+            .text-3xl {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+            }
+
+            .exercise-card .flex {
+                font-size: 0.875rem;
+            }
+
+            #timerModal button {
+                padding: 0.6rem 0.4rem;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -557,6 +631,29 @@
                         {name: 'Планка с отягощением', sets: 3, reps: '45 сек', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
                         {name: 'Подтягивания', sets: 4, reps: 'макс', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
                     ]
+                },
+                advanced: {
+                    fatloss: [
+                        {name: 'Интенсивные Burpees', sets: 5, reps: '15', rest: 60, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Прыжки с группировкой', sets: 4, reps: '12', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Спринт на месте', sets: 5, reps: '45 сек', rest: 60, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Плиометрические отжимания', sets: 4, reps: '10', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Скалолаз интенсив', sets: 5, reps: '30', rest: 45, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Пистолетики (приседания на одной ноге)', sets: 4, reps: '8 каждая', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания с подъемом ног', sets: 4, reps: '12', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Болгарские выпады', sets: 4, reps: '10 каждая', rest: 90, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка с касанием плеч', sets: 4, reps: '20', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'V-образные подъемы', sets: 4, reps: '15', rest: 60, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Взрывные отжимания', sets: 5, reps: '8', rest: 150, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Приседания с выпрыгиванием', sets: 5, reps: '12', rest: 120, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Стойка на руках у стены', sets: 4, reps: '30 сек', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'L-планка', sets: 4, reps: '20 сек', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Отжимания на одной руке', sets: 4, reps: '5 каждая', rest: 150, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ]
                 }
             },
             home_dumbbells: {
@@ -602,6 +699,29 @@
                         {name: 'Выпады назад с гантелями', sets: 4, reps: '8 каждая нога', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
                         {name: 'Шраги с гантелями', sets: 4, reps: '12', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
                     ]
+                },
+                advanced: {
+                    fatloss: [
+                        {name: 'Трастеры с гантелями', sets: 5, reps: '12', rest: 60, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Рывки гантелей', sets: 4, reps: '10 каждая', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Выпрыгивания с гантелями', sets: 4, reps: '12', rest: 90, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Махи гантелью', sets: 5, reps: '20', rest: 60, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Берпи с гантелями', sets: 4, reps: '10', rest: 90, calories: 17, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Комплексные махи', sets: 4, reps: '12', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Жим + приседание', sets: 4, reps: '10', rest: 90, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Тяга в выпаде', sets: 4, reps: '8 каждая', rest: 90, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Турецкий подъем', sets: 3, reps: '5 каждая', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Дровосек с гантелью', sets: 4, reps: '12 каждая', rest: 60, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Жим гантелей стоя тяжелые', sets: 5, reps: '5', rest: 150, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Болгарский сплит-присед', sets: 5, reps: '6 каждая', rest: 120, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Тяга Пендлея', sets: 5, reps: '5', rest: 150, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Жим Арнольда', sets: 4, reps: '8', rest: 120, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Румынская тяга на одной', sets: 4, reps: '8 каждая', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ]
                 }
             },
             outdoor: {
@@ -627,9 +747,78 @@
                         {name: 'Отжимания с хлопком', sets: 4, reps: '8', rest: 120, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
                         {name: 'Бёрпи', sets: 4, reps: '12', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
                     ]
+                },
+                intermediate: {
+                    fatloss: [
+                        {name: 'Интервальный бег', sets: 1, reps: '20 мин', rest: 0, calories: 80, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Спринты 200м', sets: 6, reps: '1', rest: 120, calories: 70, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Бёрпи', sets: 5, reps: '15', rest: 60, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Прыжки на скамью', sets: 4, reps: '12', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Скалолаз', sets: 4, reps: '30', rest: 60, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Бег средней интенсивности', sets: 1, reps: '25 мин', rest: 0, calories: 90, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Приседания с выпрыгиванием', sets: 4, reps: '15', rest: 90, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания на брусьях', sets: 4, reps: '10', rest: 120, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Подтягивания широким хватом', sets: 4, reps: 'макс', rest: 120, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка динамическая', sets: 3, reps: '60 сек', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Спринты в гору', sets: 8, reps: '50м', rest: 150, calories: 80, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Подтягивания с утяжелением', sets: 5, reps: '6', rest: 150, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Отжимания на брусьях с весом', sets: 5, reps: '8', rest: 150, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Приседания на одной ноге', sets: 4, reps: '8 каждая', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Планка с подъемом рук', sets: 4, reps: '20', rest: 90, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ]
+                },
+                advanced: {
+                    fatloss: [
+                        {name: 'HIIT бег', sets: 1, reps: '30 мин', rest: 0, calories: 120, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Спринты 400м', sets: 8, reps: '1', rest: 180, calories: 100, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Бёрпи с подтягиванием', sets: 5, reps: '12', rest: 90, calories: 22, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Прыжки на высоту', sets: 5, reps: '10', rest: 120, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Челночный бег', sets: 6, reps: '10x10м', rest: 90, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Длительный бег', sets: 1, reps: '40 мин', rest: 0, calories: 140, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Подтягивания обратным хватом', sets: 5, reps: 'макс', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Отжимания плиометрические', sets: 5, reps: '12', rest: 120, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Пистолеты', sets: 4, reps: '10 каждая', rest: 120, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'L-сит', sets: 4, reps: '30 сек', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Спринты максимальные', sets: 10, reps: '100м', rest: 240, calories: 120, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Подтягивания на одной руке', sets: 5, reps: '3 каждая', rest: 180, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Отжимания стойка на руках', sets: 5, reps: '8', rest: 150, calories: 17, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Прыжки в высоту максимум', sets: 5, reps: '8', rest: 120, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Планка на руках', sets: 4, reps: '90 сек', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ]
                 }
             },
             gym: {
+                beginner: {
+                    fatloss: [
+                        {name: 'Беговая дорожка', sets: 1, reps: '15 мин', rest: 0, calories: 50, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Жим лежа легкий', sets: 3, reps: '12', rest: 90, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания в Смите', sets: 3, reps: '12', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Тяга горизонтального блока', sets: 3, reps: '12', rest: 90, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Жим ногами', sets: 3, reps: '15', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Эллипсоид', sets: 1, reps: '20 мин', rest: 0, calories: 60, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Жим гантелей лежа', sets: 3, reps: '12', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Выпады в ходьбе', sets: 3, reps: '10 каждая', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Тяга верхнего блока', sets: 3, reps: '12', rest: 90, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Сведение рук в тренажере', sets: 3, reps: '15', rest: 60, calories: 5, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Жим лежа', sets: 4, reps: '8', rest: 120, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания со штангой', sets: 4, reps: '8', rest: 120, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Становая тяга', sets: 4, reps: '6', rest: 150, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Тяга штанги к поясу', sets: 4, reps: '8', rest: 120, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Жим штанги стоя', sets: 3, reps: '8', rest: 120, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ]
+                },
                 intermediate: {
                     fatloss: [
                         {name: 'Жим лежа', sets: 4, reps: '10', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
@@ -654,6 +843,30 @@
                         {name: 'Жим стоя', sets: 4, reps: '5', rest: 150, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
                         {name: 'Подтягивания', sets: 4, reps: 'макс', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
                         {name: 'Штанга в руках', sets: 4, reps: '6', rest: 120, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'}
+                    ]
+                },
+                advanced: {
+                    fatloss: [
+                        {name: 'Комплексы со штангой', sets: 5, reps: '8', rest: 90, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Рывок штанги', sets: 5, reps: '5', rest: 120, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Толчок штанги', sets: 5, reps: '5', rest: 120, calories: 19, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Трастеры', sets: 5, reps: '10', rest: 90, calories: 17, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Становая + жим', sets: 4, reps: '8', rest: 120, calories: 20, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Суперсеты грудь+спина', sets: 5, reps: '10', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Присед фронтальный', sets: 5, reps: '8', rest: 120, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Румынская + тяга', sets: 4, reps: '10', rest: 90, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Подтягивания разным хватом', sets: 5, reps: 'макс', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Дропсеты жим+махи', sets: 4, reps: '12/8/4', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Жим макс 1-3ПМ', sets: 6, reps: '1-3', rest: 240, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Присед макс 1-3ПМ', sets: 6, reps: '1-3', rest: 240, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Становая макс 1-3ПМ', sets: 6, reps: '1-3', rest: 300, calories: 22, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Жим стоя тяжелый', sets: 5, reps: '3', rest: 180, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Подтягивания с весом', sets: 5, reps: '5', rest: 180, calories: 16, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Тяга т-грифа тяжелая', sets: 5, reps: '5', rest: 150, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'}
                     ]
                 }
             }
@@ -698,7 +911,25 @@
         });
 
         document.getElementById('clearPlan').addEventListener('click', function() {
-            document.getElementById('workoutDisplay').classList.add('hidden');
+            if (confirm('Вы уверены, что хотите очистить текущий план тренировки?')) {
+                const workoutDisplay = document.getElementById('workoutDisplay');
+                const workoutPlan = document.getElementById('workoutPlan');
+
+                // Clear content
+                if (workoutPlan) workoutPlan.innerHTML = '';
+
+                // Hide section with animation
+                if (workoutDisplay) {
+                    workoutDisplay.style.opacity = '0';
+                    setTimeout(() => {
+                        workoutDisplay.classList.add('hidden');
+                        workoutDisplay.style.opacity = '1';
+                    }, 300);
+                }
+
+                // Scroll back to planner
+                document.querySelector('.hero-section')?.scrollIntoView({ behavior: 'smooth' });
+            }
         });
 
         function generateWorkoutPlan(preferences = {}) {
