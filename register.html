@@ -420,7 +420,7 @@
         });
 
         // Form submission
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             // Validate all fields
@@ -430,23 +430,47 @@
             const isConfirmPasswordValid = validateConfirmPassword();
 
             if (isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
-                // Save to localStorage
-                const userData = {
-                    fullName: fullName.value.trim(),
-                    email: email.value.trim(),
-                    registrationDate: new Date().toISOString(),
-                    isRegistered: true
-                };
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Регистрация...';
 
-                localStorage.setItem('eliteFitnessUser', JSON.stringify(userData));
+                try {
+                    // Регистрация через Firebase
+                    const result = await registerUser(
+                        email.value.trim(),
+                        password.value,
+                        fullName.value.trim()
+                    );
 
-                // Show success message
-                showSuccessMessage();
+                    if (result.success) {
+                        // Дублируем в localStorage для совместимости со старым кодом
+                        const userData = {
+                            fullName: fullName.value.trim(),
+                            email: email.value.trim(),
+                            registrationDate: new Date().toISOString(),
+                            isRegistered: true
+                        };
+                        localStorage.setItem('eliteFitnessUser', JSON.stringify(userData));
 
-                // Redirect to main page after 2 seconds
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+                        // Show success message
+                        showSuccessMessage();
+
+                        // Redirect to main page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    } else {
+                        // Показываем ошибку
+                        alert('Ошибка регистрации: ' + result.error);
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Зарегистрироваться';
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Ошибка регистрации. Попробуйте еще раз.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Зарегистрироваться';
+                }
             }
         });
 
@@ -474,5 +498,12 @@
             mobileMenu.classList.toggle('hidden');
         });
     </script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
 </body>
 </html>
