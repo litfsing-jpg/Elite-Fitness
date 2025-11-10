@@ -663,13 +663,16 @@
                         {
                             to_email: user.email,
                             to_name: user.fullName || 'Пользователь',
+                            from_name: 'Elite Fitness',
                             subject: subject,
-                            message: body
+                            message: body,
+                            reply_to: 'noreply@elitefitness.com'
                         }
                     );
                     sent++;
                 } catch (error) {
                     console.error(`Ошибка отправки на ${user.email}:`, error);
+                    console.error('Детали ошибки:', error.text);
                     failed++;
                 }
 
