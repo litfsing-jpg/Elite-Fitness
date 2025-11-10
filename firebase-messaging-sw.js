@@ -7,13 +7,13 @@ importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-comp
 // Конфигурация Firebase (такая же, как в firebase-config.js)
 // ВАЖНО: Замените на свои значения после создания проекта в Firebase Console
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID"
+    apiKey: "AIzaSyBL3AC8BxWfWUuBhJp4swc1p9MCX1ZyOnA",
+    authDomain: "elite-fitness-b4d47.firebaseapp.com",
+    projectId: "elite-fitness-b4d47",
+    storageBucket: "elite-fitness-b4d47.firebasestorage.app",
+    messagingSenderId: "223906189767",
+    appId: "1:223906189767:web:0cb639ff38470161ebc9e2",
+    measurementId: "G-Q0R0H7FR1P"
 };
 
 // Инициализируем Firebase в Service Worker
