@@ -394,54 +394,36 @@
                 return;
             }
 
-            // Check if admin
+            // Успешный вход - грузим админку
             const userDataResult = await getUserData(result.user.uid);
-            if (!userDataResult.success || !userDataResult.data.isAdmin) {
-                errorDiv.textContent = 'У вас нет прав доступа к админ-панели';
-                errorDiv.classList.remove('hidden');
-                await logoutUser();
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
+            const userName = userDataResult.success ? userDataResult.data.fullName : 'Админ';
 
-            // Load admin dashboard
-            await loadAdminDashboard(userDataResult.data);
-        }
-
-        // Check admin auth
-        onAuthStateChanged(async (user) => {
-            if (!user) {
-                // Show login screen
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
-
-            // Check if user is admin
-            const userDataResult = await getUserData(user.uid);
-            if (!userDataResult.success || !userDataResult.data.isAdmin) {
-                // Not admin, show login
-                await logoutUser();
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
-
-            // Load admin dashboard
-            await loadAdminDashboard(userDataResult.data);
-        });
-
-        async function loadAdminDashboard(userData) {
-            document.getElementById('adminName').textContent = userData.fullName || 'Админ';
-
-            // Load dashboard data
+            document.getElementById('adminName').textContent = userName;
             await loadDashboardData();
 
-            // Hide loading, show content
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
         }
+
+        // Check if already logged in
+        onAuthStateChanged(async (user) => {
+            if (!user) {
+                // Не залогинен - показываем форму
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                return;
+            }
+
+            // Уже залогинен - грузим админку сразу
+            const userDataResult = await getUserData(user.uid);
+            const userName = userDataResult.success ? userDataResult.data.fullName : 'Админ';
+
+            document.getElementById('adminName').textContent = userName;
+            await loadDashboardData();
+
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+        });
 
         async function loadDashboardData() {
             try {
