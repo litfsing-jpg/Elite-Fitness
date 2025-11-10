@@ -279,7 +279,7 @@
         <div class="max-w-4xl mx-auto">
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Personal Information -->
-                <div class="glass-card fade-in">
+                <div class="glass-card fade-in" id="personalInfoCard">
                     <h2 class="text-2xl font-bold mb-6">Личная информация</h2>
                     
                     <div class="space-y-4">
@@ -550,23 +550,29 @@
             if (profileData.activityLevel) document.querySelectorAll('select')[2].value = profileData.activityLevel;
             if (profileData.preferredTime) document.querySelectorAll('select')[3].value = profileData.preferredTime;
 
-            // Make all input fields readonly by default
-            const inputs = document.querySelectorAll('.input-field');
-            inputs.forEach(input => {
-                if (input.tagName === 'SELECT') {
-                    input.setAttribute('disabled', true);
-                } else {
-                    input.setAttribute('readonly', true);
-                }
-            });
+            // Make only personal info fields readonly by default
+            const personalInfoCard = document.getElementById('personalInfoCard');
+            if (personalInfoCard) {
+                const inputs = personalInfoCard.querySelectorAll('.input-field');
+                inputs.forEach(input => {
+                    if (input.tagName === 'SELECT') {
+                        input.setAttribute('disabled', true);
+                    } else {
+                        input.setAttribute('readonly', true);
+                    }
+                });
+            }
         }
 
         function enableEditing() {
-            const inputs = document.querySelectorAll('.input-field');
-            inputs.forEach(input => {
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-            });
+            const personalInfoCard = document.getElementById('personalInfoCard');
+            if (personalInfoCard) {
+                const inputs = personalInfoCard.querySelectorAll('.input-field');
+                inputs.forEach(input => {
+                    input.removeAttribute('readonly');
+                    input.removeAttribute('disabled');
+                });
+            }
 
             const button = event.target;
             button.textContent = 'Сохранить изменения';
@@ -596,14 +602,18 @@
             profileData.currentWeight = weight;
             localStorage.setItem('profileData', JSON.stringify(profileData));
 
-            const inputs = document.querySelectorAll('.input-field');
-            inputs.forEach(input => {
-                if (input.tagName === 'SELECT') {
-                    input.setAttribute('disabled', true);
-                } else {
-                    input.setAttribute('readonly', true);
-                }
-            });
+            // Lock only personal info fields
+            const personalInfoCard = document.getElementById('personalInfoCard');
+            if (personalInfoCard) {
+                const inputs = personalInfoCard.querySelectorAll('.input-field');
+                inputs.forEach(input => {
+                    if (input.tagName === 'SELECT') {
+                        input.setAttribute('disabled', true);
+                    } else {
+                        input.setAttribute('readonly', true);
+                    }
+                });
+            }
 
             const button = event.target;
             button.textContent = 'Редактировать профиль';
