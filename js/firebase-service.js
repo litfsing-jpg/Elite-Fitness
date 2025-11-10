@@ -174,12 +174,18 @@ async function getUserWorkouts(userId) {
     try {
         const querySnapshot = await firebaseDB.collection('workouts')
             .where('userId', '==', userId)
-            .orderBy('date', 'desc')
             .get();
 
         const workouts = [];
         querySnapshot.forEach((doc) => {
             workouts.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Сортируем на клиенте (чтобы не требовался индекс)
+        workouts.sort((a, b) => {
+            const dateA = a.date ? new Date(a.date) : new Date(0);
+            const dateB = b.date ? new Date(b.date) : new Date(0);
+            return dateB - dateA; // По убыванию (новые сначала)
         });
 
         return { success: true, data: workouts };
