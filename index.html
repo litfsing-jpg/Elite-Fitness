@@ -186,8 +186,14 @@
         }
         
         @media (max-width: 768px) {
+            .hero-section {
+                padding-top: 5rem;
+                height: auto;
+                min-height: 100vh;
+            }
+
             .content-overlay {
-                padding: 0 1rem;
+                padding: 2rem 1rem;
             }
 
             .glass-card {
@@ -218,20 +224,39 @@
             }
 
             .exercise-card {
-                padding: 1rem;
+                padding: 0.875rem;
             }
 
             .exercise-card .flex {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 0.75rem;
+                align-items: flex-start;
             }
 
             .exercise-card img,
-            .exercise-card .w-16 {
-                width: 100%;
-                height: auto;
-                max-height: 150px;
+            .exercise-card .w-16.h-16 {
+                width: 4rem !important;
+                height: 4rem !important;
+                min-width: 4rem;
+                flex-shrink: 0;
+                border-radius: 8px;
                 object-fit: cover;
+            }
+
+            .exercise-card .flex > div {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .exercise-card h3 {
+                font-size: 0.95rem;
+                margin-bottom: 0.25rem;
+                line-height: 1.3;
+            }
+
+            .exercise-card p {
+                font-size: 0.8rem;
+                line-height: 1.3;
             }
 
             .btn-primary {
@@ -239,14 +264,8 @@
                 font-size: 0.9rem;
             }
 
-            #workoutPlan .exercise-card .flex {
-                flex-direction: row;
-            }
-
-            #workoutPlan .exercise-card .flex .w-16 {
-                width: 4rem;
-                height: 4rem;
-                min-width: 4rem;
+            #workoutDisplay {
+                padding-top: 6rem;
             }
         }
 
@@ -257,11 +276,15 @@
 
             .hero-section {
                 min-height: auto;
-                padding: 5rem 1rem 2rem;
+                padding: 5rem 0.5rem 2rem;
+            }
+
+            .content-overlay {
+                padding: 2rem 0.5rem;
             }
 
             h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
 
             .chip {
@@ -278,27 +301,55 @@
 
             .text-5xl,
             .text-4xl {
-                font-size: 1.875rem;
-                line-height: 2.25rem;
-            }
-
-            .text-3xl {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
                 line-height: 2rem;
             }
 
-            .text-2xl {
+            .text-3xl {
                 font-size: 1.25rem;
                 line-height: 1.75rem;
             }
 
-            .exercise-card .flex {
+            .text-2xl {
+                font-size: 1.125rem;
+                line-height: 1.5rem;
+            }
+
+            .text-xl {
+                font-size: 1rem;
+                line-height: 1.5rem;
+            }
+
+            .glass-card {
+                padding: 1rem;
+            }
+
+            .exercise-card {
+                padding: 0.75rem;
+            }
+
+            .exercise-card img,
+            .exercise-card .w-16.h-16 {
+                width: 3.5rem !important;
+                height: 3.5rem !important;
+                min-width: 3.5rem;
+            }
+
+            .exercise-card h3 {
                 font-size: 0.875rem;
+            }
+
+            .exercise-card p {
+                font-size: 0.75rem;
             }
 
             #timerModal button {
                 padding: 0.6rem 0.4rem;
                 font-size: 0.8rem;
+            }
+
+            #workoutDisplay {
+                padding-top: 5rem;
             }
         }
     </style>
@@ -580,6 +631,59 @@
             duration: 45,
             goal: 'tone'
         };
+
+        // Exercise image mapping
+        function getExerciseImage(exerciseName) {
+            const imageMap = {
+                // Приседания
+                'Приседания': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+                'Одноногие приседания': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+                'Выпрыгивания из приседа': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+                'Приседания с выпрыгиванием': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+                'Приседания с гантелями': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+
+                // Отжимания
+                'Отжимания': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
+                'Отжимания от пола': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
+                'Отжимания с хлопком': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
+                'Отжимания с гантелями': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
+                'Обратные отжимания': 'https://images.unsplash.com/photo-1581009146145-b5c25f1e5c7f?w=400&h=400&fit=crop',
+
+                // Выпады
+                'Выпады': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+                'Выпады с гантелями': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+                'Выпады вперед': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+                'Выпады в сторону': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+
+                // Планка
+                'Планка': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
+                'Планка с поднятием ног': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
+                'Планка на одной руке': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
+                'Боковая планка': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
+
+                // Пресс
+                'Скручивания': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
+                'Велосипед': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
+                'Подъем ног': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
+                'Русские скручивания': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
+
+                // Другие
+                'Бёрпи': 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=400&h=400&fit=crop',
+                'Горные альпинисты': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=400&fit=crop',
+                'Ягодичный мост': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+                'Ягодичный мост на одной ноге': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+                'Прыжки со скакалкой': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop',
+                'Бег на месте': 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=400&fit=crop',
+                'Жим гантелей': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop',
+                'Тяга гантелей': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop',
+                'Подтягивания': 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=400&h=400&fit=crop',
+                'Становая тяга': 'https://images.unsplash.com/photo-1534368959876-26bf04f2c947?w=400&h=400&fit=crop',
+                'Жим штанги': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop'
+            };
+
+            // Возвращаем изображение для упражнения или дефолтное
+            return imageMap[exerciseName] || 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop';
+        }
 
         // Enhanced exercise database with more exercises
         const exerciseDatabase = {
@@ -1018,12 +1122,12 @@
             const div = document.createElement('div');
             div.className = 'exercise-card mb-4 fade-in';
             div.style.animationDelay = `${index * 0.1}s`;
-            
+
             const isSpecial = exercise.type === 'warmup' || exercise.type === 'cooldown';
-            const bgClass = exercise.type === 'warmup' ? 'from-orange-500 to-red-500' : 
-                           exercise.type === 'cooldown' ? 'from-teal-500 to-blue-500' : 
+            const bgClass = exercise.type === 'warmup' ? 'from-orange-500 to-red-500' :
+                           exercise.type === 'cooldown' ? 'from-teal-500 to-blue-500' :
                            'from-gray-700 to-gray-800';
-            
+
             if (isSpecial) {
                 div.className = `mb-4 p-4 bg-gradient-to-r ${bgClass} rounded-lg fade-in`;
                 div.innerHTML = `
@@ -1031,27 +1135,26 @@
                     <p class="text-sm">${exercise.description}</p>
                 `;
             } else {
+                const imgUrl = getExerciseImage(exercise.name);
                 div.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 rounded-lg overflow-hidden">
-                            <img src="${exercise.img}" alt="${exercise.name}" class="w-full h-full object-cover">
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="${imgUrl}" alt="${exercise.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop'">
                         </div>
-                        <div class="flex-1">
-                            <h3 class="text-lg font-bold">${exercise.name}</h3>
-                            <div class="flex space-x-4 text-sm text-gray-300 mt-1">
-                                <span>${exercise.sets} подхода</span>
-                                <span>${exercise.reps} повторений</span>
-                                <span>Отдых: ${exercise.rest} сек</span>
-                                <span class="text-green-400">🔥 ${exercise.calories} кал</span>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-bold mb-1 leading-tight">${exercise.name}</h3>
+                            <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-300">
+                                <span class="whitespace-nowrap">${exercise.sets} под</span>
+                                <span class="whitespace-nowrap">${exercise.reps} повт</span>
+                                <span class="whitespace-nowrap">⏱ ${exercise.rest}с</span>
+                                <span class="text-green-400 whitespace-nowrap">🔥 ${exercise.calories}</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-2xl">💪</div>
-                        </div>
+                        <div class="text-xl flex-shrink-0">💪</div>
                     </div>
                 `;
             }
-            
+
             return div;
         }
 
