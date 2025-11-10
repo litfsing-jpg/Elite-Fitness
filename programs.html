@@ -361,6 +361,41 @@
         </div>
     </section>
 
+    <!-- Timer Modal -->
+    <div id="timerModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-75 backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="glass-card max-w-md w-full">
+                <h2 class="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-red-400 to-teal-400 bg-clip-text text-transparent">
+                    Секундомер тренировки
+                </h2>
+
+                <div class="text-center mb-6">
+                    <div id="startTime" class="text-sm text-gray-400 mb-4"></div>
+                    <div id="timerDisplay" class="text-6xl font-bold mb-4 font-mono">00:00:00</div>
+                    <div class="text-lg text-gray-300">
+                        Калории: <span id="caloriesBurned" class="text-green-400 font-bold">0</span> ккал
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mb-4">
+                    <button id="pauseTimer" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-lg font-semibold transition-all">
+                        ⏸ Пауза
+                    </button>
+                    <button id="resumeTimer" class="hidden flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold transition-all">
+                        ▶ Продолжить
+                    </button>
+                    <button id="resetTimer" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold transition-all">
+                        🔄 Сброс
+                    </button>
+                </div>
+
+                <button id="stopWorkout" class="w-full bg-gradient-to-r from-red-400 to-teal-400 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                    ✓ Завершить тренировку
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Program Details Modal -->
     <div id="programModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 backdrop-blur-sm">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
@@ -609,10 +644,24 @@
                 card.className = 'program-card fade-in';
                 card.style.animationDelay = `${index * 0.1}s`;
 
+                // Define gradient and icon based on difficulty and goal
+                let gradient, icon;
+                if (program.difficulty === 'beginner') {
+                    gradient = program.goal === 'strength' ? 'from-blue-400 via-blue-500 to-blue-600' : 'from-green-400 via-green-500 to-green-600';
+                    icon = program.goal === 'strength' ? '💪' : '🏃‍♂️';
+                } else if (program.difficulty === 'intermediate') {
+                    gradient = program.goal === 'strength' ? 'from-purple-400 via-purple-500 to-purple-600' : 'from-orange-400 via-orange-500 to-orange-600';
+                    icon = program.goal === 'strength' ? '⚡' : '🔥';
+                } else {
+                    gradient = program.goal === 'strength' ? 'from-red-400 via-red-500 to-red-600' : 'from-pink-400 via-pink-500 to-pink-600';
+                    icon = program.goal === 'strength' ? '🏋️' : '⚡';
+                }
+
                 card.innerHTML = `
                     <div class="relative mb-4">
-                        <div class="w-full h-48 bg-gradient-to-br from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
-                            <div class="text-6xl text-white">${program.difficulty === 'beginner' ? '🌱' : program.difficulty === 'intermediate' ? '⚡' : '🔥'}</div>
+                        <div class="w-full h-48 bg-gradient-to-br ${gradient} rounded-lg flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-black opacity-10"></div>
+                            <div class="text-8xl relative z-10 filter drop-shadow-lg">${icon}</div>
                         </div>
                         <div class="absolute top-3 right-3">
                             <span class="difficulty-badge difficulty-${program.difficulty}">
@@ -757,9 +806,9 @@
                     <button onclick="closeProgramModal()" class="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">
                         Закрыть
                     </button>
-                    <a href="index.html" class="px-6 py-2 rounded-lg bg-gradient-to-r from-red-400 to-teal-400 text-white font-semibold hover:shadow-lg transition-all">
+                    <button onclick="startWorkout()" class="px-6 py-2 rounded-lg bg-gradient-to-r from-red-400 to-teal-400 text-white font-semibold hover:shadow-lg transition-all">
                         Начать тренировку
-                    </a>
+                    </button>
                 </div>
             `;
 
@@ -772,6 +821,70 @@
             const modal = document.getElementById('programModal');
             modal.classList.add('hidden');
             document.body.style.overflow = '';
+        }
+
+        // Workout Timer System
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isPaused = false;
+        let workoutStartTime = null;
+        let currentCalories = 0;
+
+        // Start workout function
+        function startWorkout() {
+            // Close program modal
+            closeProgramModal();
+
+            // Open timer modal
+            const timerModal = document.getElementById('timerModal');
+            timerModal.classList.remove('hidden');
+            workoutStartTime = new Date();
+
+            // Set start time
+            const startTimeElement = document.getElementById('startTime');
+            startTimeElement.textContent = `Начало: ${workoutStartTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+
+            // Reset timer
+            timerSeconds = 0;
+            currentCalories = 0;
+            isPaused = false;
+            updateTimerDisplay();
+            updateCalories();
+
+            // Show pause, hide resume
+            document.getElementById('pauseTimer').classList.remove('hidden');
+            document.getElementById('resumeTimer').classList.add('hidden');
+
+            // Start timer
+            startTimer();
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    timerSeconds++;
+                    updateTimerDisplay();
+                    updateCalories();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
+            const seconds = timerSeconds % 60;
+
+            const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+        }
+
+        function updateCalories() {
+            // Approximate calories burned: ~5-8 calories per minute depending on intensity
+            const minutes = timerSeconds / 60;
+            currentCalories = Math.floor(minutes * 6);
+            document.getElementById('caloriesBurned').textContent = currentCalories;
         }
 
         // Filter buttons
@@ -844,11 +957,76 @@
         document.addEventListener('DOMContentLoaded', function() {
             renderPrograms();
             initCharts();
-            
+
             // Mobile menu toggle
             document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
                 const mobileMenu = document.querySelector('.mobile-menu');
                 mobileMenu.classList.toggle('hidden');
+            });
+
+            // Timer controls
+            // Pause timer
+            document.getElementById('pauseTimer').addEventListener('click', function() {
+                isPaused = true;
+                this.classList.add('hidden');
+                document.getElementById('resumeTimer').classList.remove('hidden');
+            });
+
+            // Resume timer
+            document.getElementById('resumeTimer').addEventListener('click', function() {
+                isPaused = false;
+                this.classList.add('hidden');
+                document.getElementById('pauseTimer').classList.remove('hidden');
+            });
+
+            // Reset timer
+            document.getElementById('resetTimer').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите сбросить таймер?')) {
+                    timerSeconds = 0;
+                    currentCalories = 0;
+                    updateTimerDisplay();
+                    updateCalories();
+                }
+            });
+
+            // Stop workout
+            document.getElementById('stopWorkout').addEventListener('click', function() {
+                const minutes = Math.floor(timerSeconds / 60);
+                const message = `Тренировка завершена!\n\nВремя: ${minutes} мин\nКалории: ${currentCalories} ккал\n\nОтличная работа! 🎉`;
+
+                if (confirm(message)) {
+                    // Stop timer
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+
+                    // Save workout to history
+                    const workoutData = {
+                        date: new Date().toISOString(),
+                        duration: timerSeconds,
+                        calories: currentCalories,
+                        completed: true
+                    };
+
+                    // Save to localStorage
+                    let history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+                    history.push(workoutData);
+                    localStorage.setItem('workoutHistory', JSON.stringify(history));
+
+                    // Reset timer
+                    timerSeconds = 0;
+                    currentCalories = 0;
+                    isPaused = false;
+                    updateTimerDisplay();
+                    updateCalories();
+
+                    // Close modal
+                    const timerModal = document.getElementById('timerModal');
+                    timerModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+
+                    // Show success message
+                    alert('Тренировка сохранена! Продолжайте в том же духе! 💪');
+                }
             });
         });
 
