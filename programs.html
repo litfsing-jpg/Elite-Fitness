@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Тренировочные программы - Elite Fitness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.0.3/plotly.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #ff6b6b;
+            --success: #4ecdc4;
+            --warning: #ffe66d;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .program-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .program-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .program-card:hover::before {
+            left: 100%;
+        }
+        
+        .program-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .difficulty-beginner {
+            background: rgba(76, 205, 196, 0.2);
+            color: #4ecdc4;
+            border: 1px solid rgba(76, 205, 196, 0.3);
+        }
+        
+        .difficulty-intermediate {
+            background: rgba(255, 230, 109, 0.2);
+            color: #ffe66d;
+            border: 1px solid rgba(255, 230, 109, 0.3);
+        }
+        
+        .difficulty-advanced {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-20 backdrop-blur-lg border-b border-white border-opacity-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">EF</span>
+                    </div>
+                    <span class="text-xl font-bold">Elite Fitness</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-white hover:text-red-400 transition-colors">Главная</a>
+                    <a href="#" class="text-red-400">Программы</a>
+                    <a href="progress.html" class="text-white hover:text-red-400 transition-colors">Прогресс</a>
+                    <a href="profile.html" class="text-white hover:text-red-400 transition-colors">Профиль</a>
+                </div>
+                <button class="md:hidden text-white mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <!-- Mobile Menu -->
+                <div class="mobile-menu hidden absolute top-16 left-0 right-0 bg-black bg-opacity-90 backdrop-blur-lg border-t border-white border-opacity-10 md:hidden">
+                    <div class="px-4 py-4 space-y-2">
+                        <a href="index.html" class="block py-2 text-white hover:text-red-400 transition-colors">Главная</a>
+                        <a href="#" class="block py-2 text-red-400">Программы</a>
+                        <a href="progress.html" class="block py-2 text-white hover:text-red-400 transition-colors">Прогресс</a>
+                        <a href="profile.html" class="block py-2 text-white hover:text-red-400 transition-colors">Профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-5xl font-black mb-6 bg-gradient-to-r from-red-400 to-teal-400 bg-clip-text text-transparent">
+                Тренировочные программы
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Выберите программу, которая подходит именно вам. От новичков до профессионалов - у каждого есть путь к совершенству.
+            </p>
+            
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="filter-btn active" data-filter="all">Все программы</button>
+                <button class="filter-btn" data-filter="beginner">Для новичков</button>
+                <button class="filter-btn" data-filter="intermediate">Средний уровень</button>
+                <button class="filter-btn" data-filter="advanced">Продвинутый</button>
+                <button class="filter-btn" data-filter="fatloss">Похудение</button>
+                <button class="filter-btn" data-filter="strength">Набор силы</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Grid -->
+    <section class="pb-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="programsGrid">
+                <!-- Program cards will be inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-20 px-4 bg-black bg-opacity-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Результаты наших клиентов</h2>
+                <p class="text-xl text-gray-300">Данные основаны на реальной статистике</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass-card">
+                    <h3 class="text-xl font-bold mb-4">Прогресс по программам</h3>
+                    <div id="progressChart" style="height: 300px;"></div>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 class="text-xl font-bold mb-4">Популярность программ</h3>
+                    <div id="popularityChart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EF</span>
+                </div>
+                <span class="text-xl font-bold">Elite Fitness</span>
+            </div>
+            <p class="text-gray-400">© 2025 Elite Fitness Planner. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Programs data
+        const programs = [
+            {
+                id: 1,
+                title: "Новичок: Базовая силовая программа",
+                description: "Идеальная программа для начинающих. Осваиваем основные движения и строим фундамент.",
+                difficulty: "beginner",
+                duration: "4 недели",
+                sessionsPerWeek: 3,
+                goal: "strength",
+                features: ["Базовые упражнения", "Постепенное увеличение нагрузки", "Видеоинструкции"],
+                results: "+15% силы за 4 недели"
+            },
+            {
+                id: 2,
+                title: "Средний: Программа рельефности",
+                description: "Формируем рельефное тело через комбинацию силовых и кардио нагрузок.",
+                difficulty: "intermediate",
+                duration: "6 недель",
+                sessionsPerWeek: 4,
+                goal: "fatloss",
+                features: ["HIIT тренировки", "Круговые методики", "План питания"],
+                results: "-3-5 кг жира за 6 недель"
+            },
+            {
+                id: 3,
+                title: "Продвинутый: Максимальная масса",
+                description: "Интенсивная программа для набора мышечной массы. Только для опытных атлетов.",
+                difficulty: "advanced",
+                duration: "8 недель",
+                sessionsPerWeek: 5,
+                goal: "strength",
+                features: ["Тяжелые базовые упражнения", "Принцип периодизации", "Детальный питание"],
+                results: "+3-5 кг мышц за 8 недель"
+            },
+            {
+                id: 4,
+                title: "Новичок: Кардио для похудения",
+                description: "Щадящая кардио программа для эффективного сжигания жира без травм.",
+                difficulty: "beginner",
+                duration: "4 недели",
+                sessionsPerWeek: 4,
+                goal: "fatloss",
+                features: ["Низкоударные упражнения", "Постепенное увеличение интенсивности", "Минимум оборудования"],
+                results: "-2-3 кг за 4 недели"
+            },
+            {
+                id: 5,
+                title: "Средний: Функциональный тренинг",
+                description: "Развиваем функциональную силу и выносливость для повседневной жизни.",
+                difficulty: "intermediate",
+                duration: "6 недель",
+                sessionsPerWeek: 3,
+                goal: "strength",
+                features: ["Многосуставные движения", "Работа с собственным весом", "Улучшение мобильности"],
+                results: "+20% функциональной силы"
+            },
+            {
+                id: 6,
+                title: "Продвинутый: Сушка тела",
+                description: "Экстремальная программа для максимального сжигания жира сохраняя мышцы.",
+                difficulty: "advanced",
+                duration: "6 недель",
+                sessionsPerWeek: 6,
+                goal: "fatloss",
+                features: ["Двухразовые тренировки", "Кето-диета", "Добавки для сушки"],
+                results: "-5-8 кг жира за 6 недель"
+            }
+        ];
+
+        // Filter functionality
+        let currentFilter = 'all';
+
+        function renderPrograms() {
+            const grid = document.getElementById('programsGrid');
+            grid.innerHTML = '';
+
+            const filteredPrograms = currentFilter === 'all' 
+                ? programs 
+                : programs.filter(program => program.difficulty === currentFilter || program.goal === currentFilter);
+
+            filteredPrograms.forEach((program, index) => {
+                const card = document.createElement('div');
+                card.className = 'program-card fade-in';
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                card.innerHTML = `
+                    <div class="relative mb-4">
+                        <div class="w-full h-48 bg-gradient-to-br from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                            <div class="text-6xl text-white">${program.difficulty === 'beginner' ? '🌱' : program.difficulty === 'intermediate' ? '⚡' : '🔥'}</div>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="difficulty-badge difficulty-${program.difficulty}">
+                                ${program.difficulty === 'beginner' ? 'Новичок' : program.difficulty === 'intermediate' ? 'Средний' : 'Продвинутый'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-3">${program.title}</h3>
+                    <p class="text-gray-300 mb-4 text-sm leading-relaxed">${program.description}</p>
+                    
+                    <div class="flex justify-between items-center mb-4 text-sm">
+                        <span class="text-gray-400">📅 ${program.duration}</span>
+                        <span class="text-gray-400">🏋️ ${program.sessionsPerWeek} тренировок/нед</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-sm font-semibold mb-2 text-gray-300">Что включено:</h4>
+                        <ul class="text-xs text-gray-400 space-y-1">
+                            ${program.features.map(feature => `<li>• ${feature}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t border-gray-600 pt-4">
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm">
+                                <span class="text-gray-400">Результат:</span>
+                                <span class="text-green-400 font-semibold">${program.results}</span>
+                            </div>
+                            <button class="bg-gradient-to-r from-red-400 to-teal-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all" onclick="startProgram('${program.title}')">
+                                Начать
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                
+        function startProgram(title) {
+            alert(`Вы выбрали программу: "${title}". Начнем тренировки! 🚀`);
+            // Здесь можно добавить логику перехода на страницу тренировки
+            window.location.href = 'index.html';
+        }
+        
+                card.addEventListener('click', function(e) {
+                    // Не срабатывать если кликнули на кнопку
+                    if (e.target.tagName !== 'BUTTON') {
+                        startProgram(program.title);
+                    }
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderPrograms();
+            });
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Progress Chart
+            const progressData = [{
+                x: ['Неделя 1', 'Неделя 2', 'Неделя 3', 'Неделя 4', 'Неделя 5', 'Неделя 6'],
+                y: [100, 115, 125, 140, 155, 170],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Сила',
+                line: {color: '#ff6b6b', width: 3},
+                marker: {color: '#ff6b6b', size: 8}
+            }, {
+                x: ['Неделя 1', 'Неделя 2', 'Неделя 3', 'Неделя 4', 'Неделя 5', 'Неделя 6'],
+                y: [100, 108, 115, 125, 135, 145],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Выносливость',
+                line: {color: '#4ecdc4', width: 3},
+                marker: {color: '#4ecdc4', size: 8}
+            }];
+
+            const progressLayout = {
+                title: '',
+                xaxis: {title: 'Недели', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
+                yaxis: {title: 'Прогресс (%)', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {color: '#ffffff'},
+                legend: {font: {color: '#ffffff'}}
+            };
+
+            Plotly.newPlot('progressChart', progressData, progressLayout, {responsive: true});
+
+            // Popularity Chart
+            const popularityData = [{
+                values: [35, 25, 20, 15, 5],
+                labels: ['Похудение', 'Набор массы', 'Тонус', 'Сила', 'Функциональность'],
+                type: 'pie',
+                marker: {
+                    colors: ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff8e8e', '#6c5ce7']
+                },
+                textinfo: 'label+percent',
+                textfont: {color: '#ffffff'}
+            }];
+
+            const popularityLayout = {
+                title: '',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {color: '#ffffff'},
+                showlegend: false
+            };
+
+            Plotly.newPlot('popularityChart', popularityData, popularityLayout, {responsive: true});
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPrograms();
+            initCharts();
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                const mobileMenu = document.querySelector('.mobile-menu');
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+
+        // Add filter button styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .filter-btn {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #ffffff;
+                padding: 0.5rem 1rem;
+                border-radius: 25px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .filter-btn:hover, .filter-btn.active {
+                background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+                border-color: transparent;
+                transform: scale(1.05);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

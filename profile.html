@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Профиль - Elite Fitness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #ff6b6b;
+            --success: #4ecdc4;
+            --warning: #ffe66d;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        }
+        
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active::before {
+            transform: translateX(26px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-20 backdrop-blur-lg border-b border-white border-opacity-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">EF</span>
+                    </div>
+                    <span class="text-xl font-bold">Elite Fitness</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-white hover:text-red-400 transition-colors">Главная</a>
+                    <a href="programs.html" class="text-white hover:text-red-400 transition-colors">Программы</a>
+                    <a href="progress.html" class="text-white hover:text-red-400 transition-colors">Прогресс</a>
+                    <a href="#" class="text-red-400">Профиль</a>
+                </div>
+                <button class="md:hidden text-white mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <!-- Mobile Menu -->
+                <div class="mobile-menu hidden absolute top-16 left-0 right-0 bg-black bg-opacity-90 backdrop-blur-lg border-t border-white border-opacity-10 md:hidden">
+                    <div class="px-4 py-4 space-y-2">
+                        <a href="index.html" class="block py-2 text-white hover:text-red-400 transition-colors">Главная</a>
+                        <a href="programs.html" class="block py-2 text-white hover:text-red-400 transition-colors">Программы</a>
+                        <a href="progress.html" class="block py-2 text-white hover:text-red-400 transition-colors">Прогресс</a>
+                        <a href="#" class="block py-2 text-red-400">Профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-card text-center fade-in">
+                <div class="profile-avatar">
+                    АК
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Алексей Константинов</h1>
+                <p class="text-gray-300 mb-4">Фитнес энтузиаст • На платформе с января 2025</p>
+                
+                <div class="flex justify-center space-x-8 text-sm">
+                    <div>
+                        <div class="text-2xl font-bold text-red-400">127</div>
+                        <div class="text-gray-300">Тренировок</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-teal-400">89%</div>
+                        <div class="text-gray-300">Успех</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-yellow-400">45</div>
+                        <div class="text-gray-300">Дней подряд</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Content -->
+    <section class="pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Personal Information -->
+                <div class="glass-card fade-in">
+                    <h2 class="text-2xl font-bold mb-6">Личная информация</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Имя</label>
+                            <input type="text" class="input-field" value="Алексей">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Фамилия</label>
+                            <input type="text" class="input-field" value="Константинов">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" class="input-field" value="alex@example.com">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Возраст</label>
+                                <input type="number" class="input-field" value="28">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Пол</label>
+                                <select class="input-field">
+                                    <option value="male" selected>Мужской</option>
+                                    <option value="female">Женский</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Рост (см)</label>
+                                <input type="number" class="input-field" value="180">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Текущий вес (кг)</label>
+                                <input type="number" class="input-field" value="76.5">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary w-full mt-6" onclick="enableEditing()">
+                        Редактировать профиль
+                    </button>
+                </div>
+
+                <!-- Fitness Goals -->
+                <div class="glass-card fade-in" style="animation-delay: 0.2s;">
+                    <h2 class="text-2xl font-bold mb-6">Фитнес цели</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Основная цель</label>
+                            <select class="input-field">
+                                <option value="fatloss" selected>Похудение</option>
+                                <option value="muscle">Набор мышц</option>
+                                <option value="strength">Сила</option>
+                                <option value="endurance">Выносливость</option>
+                                <option value="tone">Тонус</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Целевой вес (кг)</label>
+                            <input type="number" class="input-field" value="70">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Уровень активности</label>
+                            <select class="input-field">
+                                <option value="sedentary">Сидячий образ жизни</option>
+                                <option value="light" selected>Легкая активность (1-3 дня/нед)</option>
+                                <option value="moderate">Средняя активность (3-5 дней/нед)</option>
+                                <option value="high">Высокая активность (6-7 дней/нед)</option>
+                                <option value="very-high">Очень высокая активность</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Предпочтительное время тренировок</label>
+                            <select class="input-field">
+                                <option value="morning">Утро (6:00 - 10:00)</option>
+                                <option value="afternoon">День (12:00 - 16:00)</option>
+                                <option value="evening" selected>Вечер (18:00 - 22:00)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary w-full mt-6" onclick="updateGoals()">
+                        Обновить цели
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="py-12 px-4 bg-black bg-opacity-20">
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-card fade-in">
+                <h2 class="text-2xl font-bold mb-6">Настройки</h2>
+                
+                <div class="space-y-0">
+                    <div class="setting-item">
+                        <div>
+                            <h3 class="font-semibold">Push-уведомления</h3>
+                            <p class="text-sm text-gray-300">Получать напоминания о тренировках</p>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <h3 class="font-semibold">Email-рассылка</h3>
+                            <p class="text-sm text-gray-300">Получать советы и мотивацию на email</p>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <h3 class="font-semibold">Публичный профиль</h3>
+                            <p class="text-sm text-gray-300">Показывать ваш прогресс другим пользователям</p>
+                        </div>
+                        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <h3 class="font-semibold">Автоматическая синхронизация</h3>
+                            <p class="text-sm text-gray-300">Синхронизировать данные с фитнес-трекером</p>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <h3 class="font-semibold">Темная тема</h3>
+                            <p class="text-sm text-gray-300">Использовать темную цветовую схему</p>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Account Actions -->
+    <section class="py-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass-card fade-in">
+                    <h2 class="text-xl font-bold mb-4">Экспорт данных</h2>
+                    <p class="text-gray-300 mb-4">Скачайте все ваши данные о тренировках и прогрессе</p>
+                    <button class="btn-primary w-full" onclick="exportData()">
+                        Экспортировать данные
+                    </button>
+                </div>
+                
+                <div class="glass-card fade-in" style="animation-delay: 0.2s;">
+                    <h2 class="text-xl font-bold mb-4">Удалить аккаунт</h2>
+                    <p class="text-gray-300 mb-4">Постоянное удаление всех ваших данных и аккаунта</p>
+                    <button class="btn-primary bg-red-600 hover:bg-red-700 w-full" onclick="deleteAccount()">
+                        Удалить аккаунт
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EF</span>
+                </div>
+                <span class="text-xl font-bold">Elite Fitness</span>
+            </div>
+            <p class="text-gray-400">© 2025 Elite Fitness Planner. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        function enableEditing() {
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.removeAttribute('readonly');
+                input.removeAttribute('disabled');
+            });
+            
+            const button = event.target;
+            button.textContent = 'Сохранить изменения';
+            button.onclick = saveProfile;
+        }
+        
+        function saveProfile() {
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.setAttribute('readonly', true);
+                if (input.tagName === 'SELECT') {
+                    input.setAttribute('disabled', true);
+                }
+            });
+            
+            const button = event.target;
+            button.textContent = 'Редактировать профиль';
+            button.onclick = enableEditing;
+            
+            alert('Профиль успешно обновлен! ✅');
+        }
+        
+        function updateGoals() {
+            alert('Цели обновлены! Мы подберем новую программу под ваши цели. 🎯');
+        }
+        
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+        
+        function exportData() {
+            alert('Данные экспортируются... 📊\n\nВаши данные будут отправлены на email в формате CSV.');
+        }
+        
+        function deleteAccount() {
+            if (confirm('Вы уверены, что хотите удалить аккаунт? Это действие необратимо!')) {
+                alert('Аккаунт будет удален через 30 дней. Вы можете отменить удаление в любой момент.');
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to elements
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            });
+            
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                const mobileMenu = document.querySelector('.mobile-menu');
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>>
+</html>

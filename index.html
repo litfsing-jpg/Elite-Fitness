@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Elite Fitness Planner - Планировщик тренировок мирового класса</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.birds.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #ff6b6b;
+            --success: #4ecdc4;
+            --warning: #ffe66d;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .exercise-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .exercise-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 107, 107, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chip {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chip:hover, .chip.active {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-color: transparent;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .workout-plan {
+            max-height: 600px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        .workout-plan::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .workout-plan::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .workout-plan::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .content-overlay {
+                padding: 0 1rem;
+            }
+            
+            .glass-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-20 backdrop-blur-lg border-b border-white border-opacity-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">EF</span>
+                    </div>
+                    <span class="text-xl font-bold">Elite Fitness</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-red-400">Главная</a>
+                    <a href="programs.html" class="text-white hover:text-red-400 transition-colors">Программы</a>
+                    <a href="progress.html" class="text-white hover:text-red-400 transition-colors">Прогресс</a>
+                    <a href="profile.html" class="text-white hover:text-red-400 transition-colors">Профиль</a>
+                </div>
+                <button class="md:hidden text-white mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <!-- Mobile Menu -->
+                <div class="mobile-menu hidden absolute top-16 left-0 right-0 bg-black bg-opacity-90 backdrop-blur-lg border-t border-white border-opacity-10 md:hidden">
+                    <div class="px-4 py-4 space-y-2">
+                        <a href="index.html" class="block py-2 text-white hover:text-red-400 transition-colors">Главная</a>
+                        <a href="programs.html" class="block py-2 text-white hover:text-red-400 transition-colors">Программы</a>
+                        <a href="progress.html" class="block py-2 text-white hover:text-red-400 transition-colors">Прогресс</a>
+                        <a href="profile.html" class="block py-2 text-white hover:text-red-400 transition-colors">Профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div id="vanta-bg" class="animated-bg"></div>
+        <div class="content-overlay">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Column - Title and Description -->
+                <div class="fade-in">
+                    <h1 class="text-5xl lg:text-7xl font-black mb-6 leading-tight">
+                        <span class="gradient-text">Elite</span><br>
+                        Fitness Planner
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                        Профессиональный планировщик тренировок мирового класса. 
+                        Получите персонализированные программы от элитных тренеров.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mb-8">
+                        <div class="chip">🏆 Экспертные программы</div>
+                        <div class="chip">📊 Персонализированный подход</div>
+                        <div class="chip">💪 Доказанные результаты</div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Workout Planner -->
+                <div class="slide-in">
+                    <div class="glass-card">
+                        <h2 class="text-2xl font-bold mb-6 text-center">Создайте свою тренировку</h2>
+                        
+                        <!-- Environment Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">1) Где тренируемся?</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="chip environment-option active" data-value="home">🏠 Дом</button>
+                                <button class="chip environment-option" data-value="home_dumbbells">🏋️ Дом + гантели</button>
+                                <button class="chip environment-option" data-value="gym">🏋️‍♂️ Зал</button>
+                                <button class="chip environment-option" data-value="outdoor">🌿 Улица</button>
+                            </div>
+                        </div>
+
+                        <!-- Level Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">2) Уровень подготовки</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="chip level-option active" data-value="beginner">🌱 Новичок</button>
+                                <button class="chip level-option" data-value="intermediate">⚡ Средний</button>
+                                <button class="chip level-option" data-value="advanced">🔥 Продвинутый</button>
+                            </div>
+                        </div>
+
+                        <!-- Duration Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">3) Длительность тренировки</h3>
+                            <div class="grid grid-cols-4 gap-3">
+                                <button class="chip duration-option" data-value="15">15 мин</button>
+                                <button class="chip duration-option" data-value="30">30 мин</button>
+                                <button class="chip duration-option active" data-value="45">45 мин</button>
+                                <button class="chip duration-option" data-value="60">60 мин</button>
+                            </div>
+                        </div>
+
+                        <!-- Goal Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-3">4) Цель на неделю</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="chip goal-option" data-value="fatloss">🔥 Похудение</button>
+                                <button class="chip goal-option active" data-value="tone">💪 Тонус</button>
+                                <button class="chip goal-option" data-value="strength">🏋️ Сила</button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4">
+                            <button id="generatePlan" class="btn-primary flex-1">
+                                Создать план тренировки
+                            </button>
+                            <button id="clearPlan" class="btn-primary bg-gray-600 hover:bg-gray-700">
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workout Plan Display -->
+    <section id="workoutDisplay" class="hidden py-20 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold gradient-text">Ваша тренировка</h2>
+                    <div class="text-sm text-gray-400">
+                        <span id="workoutDate"></span> • <span id="workoutTime"></span>
+                    </div>
+                </div>
+                
+                <div id="workoutPlan" class="workout-plan">
+                    <!-- Workout plan will be inserted here -->
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-gray-600">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-400">
+                            Общая длительность: <span id="totalDuration" class="text-white font-semibold">45 мин</span>
+                        </div>
+                        <button id="startWorkout" class="btn-primary">
+                            Начать тренировку
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Почему выбирают Elite Fitness?</h2>
+                <p class="text-xl text-gray-300">Профессиональный подход к вашим тренировкам</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="exercise-card floating">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold mb-3">Персонализация</h3>
+                    <p class="text-gray-300">Каждая программа адаптируется под ваш уровень, цели и доступное оборудование</p>
+                </div>
+                
+                <div class="exercise-card floating" style="animation-delay: 0.5s;">
+                    <div class="text-4xl mb-4">📈</div>
+                    <h3 class="text-xl font-bold mb-3">Прогресс tracking</h3>
+                    <p class="text-gray-300">Отслеживайте свои достижения и видите реальный прогресс в цифрах</p>
+                </div>
+                
+                <div class="exercise-card floating" style="animation-delay: 1s;">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold mb-3">Экспертные методы</h3>
+                    <p class="text-gray-300">Программы разработаны на основе научных исследований и опыта элитных тренеров</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EF</span>
+                </div>
+                <span class="text-xl font-bold">Elite Fitness</span>
+            </div>
+            <p class="text-gray-400">© 2025 Elite Fitness Planner. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.BIRDS({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            backgroundColor: 0x1a1a2e,
+            color1: 0xff6b6b,
+            color2: 0x4ecdc4,
+            colorMode: "lerpGradient",
+            birdSize: 1.20,
+            wingSpan: 25.00,
+            speedLimit: 4.00,
+            separation: 20.00,
+            alignment: 20.00,
+            cohesion: 20.00,
+            quantity: 3.00
+        });
+
+        // State management
+        const workoutState = {
+            environment: 'home',
+            level: 'beginner',
+            duration: 45,
+            goal: 'tone'
+        };
+
+        // Enhanced exercise database with more exercises
+        const exerciseDatabase = {
+            home: {
+                beginner: {
+                    fatloss: [
+                        {name: 'Приседания', sets: 3, reps: '15', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания от пола', sets: 3, reps: '10', rest: 90, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады', sets: 3, reps: '12 каждая нога', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка', sets: 3, reps: '30 сек', rest: 60, calories: 4, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Бёрпи', sets: 3, reps: '8', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Горные альпинисты', sets: 3, reps: '20', rest: 45, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Приседания', sets: 4, reps: '12', rest: 90, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания', sets: 4, reps: '8', rest: 120, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Ягодичный мост', sets: 3, reps: '15', rest: 60, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка с поднятием ног', sets: 3, reps: '10 каждая нога', rest: 60, calories: 5, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Скручивания', sets: 3, reps: '20', rest: 45, calories: 4, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Одноногие приседания', sets: 4, reps: '8 каждая нога', rest: 120, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания с хлопком', sets: 4, reps: '6', rest: 150, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпрыгивания из приседа', sets: 4, reps: '10', rest: 120, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка на одной руке', sets: 3, reps: '20 сек каждая рука', rest: 90, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Обратные отжимания', sets: 3, reps: '8', rest: 90, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ]
+                },
+                intermediate: {
+                    fatloss: [
+                        {name: 'Burpees', sets: 4, reps: '10', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Гора climbers', sets: 4, reps: '20', rest: 60, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Jump squats', sets: 4, reps: '15', rest: 90, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Push-up to plank', sets: 3, reps: '12', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Высокие колени', sets: 4, reps: '30 сек', rest: 45, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Прыжки с разведением ног', sets: 4, reps: '15', rest: 60, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Приседания с пульсом', sets: 4, reps: '15', rest: 60, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания с узкой постановкой', sets: 4, reps: '10', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады назад', sets: 4, reps: '12 каждая нога', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Планка с тапами', sets: 3, reps: '20', rest: 60, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Русские скручивания', sets: 3, reps: '15', rest: 45, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Отжимания на кольцах', sets: 4, reps: '8', rest: 120, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Пистолетики', sets: 3, reps: '5 каждая нога', rest: 120, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания с отягощением', sets: 4, reps: '6', rest: 150, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Планка с отягощением', sets: 3, reps: '45 сек', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Подтягивания', sets: 4, reps: 'макс', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ]
+                }
+            },
+            home_dumbbells: {
+                intermediate: {
+                    tone: [
+                        {name: 'Румынская тяга', sets: 3, reps: '12', rest: 45, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Жим гантелей сидя', sets: 3, reps: '10', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей к поясу', sets: 3, reps: '12', rest: 45, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Молотки на бицепс', sets: 3, reps: '15', rest: 30, calories: 4, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ],
+                    fatloss: [
+                        {name: 'Приседания с гантелями', sets: 3, reps: '15', rest: 30, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Выпады с гантелями', sets: 3, reps: '12 каждая нога', rest: 30, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Жим гантелей лежа', sets: 3, reps: '12', rest: 45, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей в наклоне', sets: 3, reps: '15', rest: 30, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Жим гантелей на наклонной', sets: 4, reps: '8', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей к животу', sets: 4, reps: '10', rest: 45, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады назад с гантелями', sets: 3, reps: '10 каждая нога', rest: 45, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Шраги с гантелями', sets: 4, reps: '12', rest: 30, calories: 5, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ]
+                },
+                beginner: {
+                    fatloss: [
+                        {name: 'Приседания с гантелями', sets: 3, reps: '12', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Жим гантелей лежа', sets: 3, reps: '10', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей в наклоне', sets: 3, reps: '12', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Молотки на бицепс', sets: 3, reps: '15', rest: 45, calories: 5, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Французский жим', sets: 3, reps: '12', rest: 60, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Румынская тяга', sets: 4, reps: '10', rest: 90, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Жим гантелей сидя', sets: 4, reps: '10', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей к поясу', sets: 4, reps: '12', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады с гантелями', sets: 3, reps: '10 каждая нога', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Подъемы на носки', sets: 4, reps: '20', rest: 45, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Мертвая тяга с гантелями', sets: 5, reps: '6', rest: 120, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Жим гантелей на наклонной', sets: 4, reps: '8', rest: 120, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга гантелей к животу', sets: 4, reps: '10', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады назад с гантелями', sets: 4, reps: '8 каждая нога', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Шраги с гантелями', sets: 4, reps: '12', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ]
+                }
+            },
+            outdoor: {
+                beginner: {
+                    fatloss: [
+                        {name: 'Бег на месте', sets: 1, reps: '5 мин', rest: 0, calories: 25, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Ходьба быстрая', sets: 1, reps: '10 мин', rest: 0, calories: 30, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания', sets: 4, reps: '15', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания', sets: 3, reps: '10', rest: 90, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Выпады', sets: 3, reps: '12 каждая нога', rest: 60, calories: 7, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Интервальная ходьба', sets: 1, reps: '15 мин', rest: 0, calories: 45, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Бег трусцой', sets: 1, reps: '10 мин', rest: 0, calories: 40, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания с прыжком', sets: 4, reps: '12', rest: 90, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Отжимания', sets: 4, reps: '12', rest: 90, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Планка', sets: 3, reps: '45 сек', rest: 60, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Бег спринт', sets: 1, reps: '5x100м', rest: 120, calories: 60, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'},
+                        {name: 'Прыжки в длину', sets: 4, reps: '8', rest: 90, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Подтягивания', sets: 4, reps: 'макс', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Отжимания с хлопком', sets: 4, reps: '8', rest: 120, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Бёрпи', sets: 4, reps: '12', rest: 90, calories: 14, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellfit.com/thmb/thmb.jpg'}
+                    ]
+                }
+            },
+            gym: {
+                intermediate: {
+                    fatloss: [
+                        {name: 'Жим лежа', sets: 4, reps: '10', rest: 90, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания со штангой', sets: 4, reps: '8', rest: 120, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Тяга штанги в наклоне', sets: 4, reps: '10', rest: 90, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Становая тяга', sets: 3, reps: '6', rest: 150, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Жим ногами', sets: 3, reps: '15', rest: 90, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Тяга верхнего блока', sets: 3, reps: '12', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    tone: [
+                        {name: 'Жим гантелей', sets: 4, reps: '12', rest: 60, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Выпады с гантелями', sets: 3, reps: '10 каждая нога', rest: 60, calories: 8, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Тяга блока к поясу', sets: 4, reps: '12', rest: 60, calories: 9, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Скручивания на прессе', sets: 3, reps: '20', rest: 45, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Разгибания на трицепс', sets: 3, reps: '15', rest: 45, calories: 5, img: 'https://kimi-web-img.moonshot.cn/img/www.shape.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Сгибания на бицепс', sets: 3, reps: '12', rest: 45, calories: 6, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'}
+                    ],
+                    strength: [
+                        {name: 'Жим лежа макс вес', sets: 5, reps: '3-5', rest: 180, calories: 12, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Приседания 5x5', sets: 5, reps: '5', rest: 180, calories: 15, img: 'https://kimi-web-img.moonshot.cn/img/www.verywellhealth.com/73450e42cae1a9b7e0c9d6b8c22e1e2d1c1b1a1e/squat.jpg'},
+                        {name: 'Становая тяга тяжело', sets: 5, reps: '3', rest: 240, calories: 18, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'},
+                        {name: 'Жим стоя', sets: 4, reps: '5', rest: 150, calories: 10, img: 'https://kimi-web-img.moonshot.cn/img/media1.popsugar-assets.com/9a8b7c6d5e4f3g2h1i0j9k8l7m6n5o4p3q2r1s0t.jpg'},
+                        {name: 'Подтягивания', sets: 4, reps: 'макс', rest: 120, calories: 13, img: 'https://kimi-web-img.moonshot.cn/img/www.bodybuilding.com/1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t.jpg'},
+                        {name: 'Штанга в руках', sets: 4, reps: '6', rest: 120, calories: 11, img: 'https://kimi-web-img.moonshot.cn/img/hips.hearstapps.com/8b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0.jpg'}
+                    ]
+                }
+            }
+        };
+
+        // Event listeners for chip selection
+        document.querySelectorAll('.environment-option').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.environment-option').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                workoutState.environment = this.dataset.value;
+            });
+        });
+
+        document.querySelectorAll('.level-option').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.level-option').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                workoutState.level = this.dataset.value;
+            });
+        });
+
+        document.querySelectorAll('.duration-option').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.duration-option').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                workoutState.duration = parseInt(this.dataset.value);
+            });
+        });
+
+        document.querySelectorAll('.goal-option').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.goal-option').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                workoutState.goal = this.dataset.value;
+            });
+        });
+
+        // Generate workout plan
+        document.getElementById('generatePlan').addEventListener('click', function() {
+            generateWorkoutPlan();
+        });
+
+        document.getElementById('clearPlan').addEventListener('click', function() {
+            document.getElementById('workoutDisplay').classList.add('hidden');
+        });
+
+        function generateWorkoutPlan(preferences = {}) {
+            const workoutData = {
+                environment: workoutState.environment,
+                level: workoutState.level,
+                duration: workoutState.duration,
+                goal: workoutState.goal,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Get exercises from database
+            const exercises = exerciseDatabase[workoutData.environment]?.[workoutData.level]?.[workoutData.goal];
+            
+            if (!exercises || exercises.length === 0) {
+                alert('Извините, для выбранных параметров пока нет программ. Попробуйте другие настройки.');
+                return;
+            }
+            
+            displayWorkoutPlan(exercises, workoutData);
+        }
+
+        function displayWorkoutPlan(exercises, workoutData) {
+            const container = document.getElementById('workoutPlan');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Add warm-up
+            const warmUp = createExerciseElement({
+                name: '🔥 Разминка',
+                description: '5-10 минут легкой кардио и динамическая растяжка',
+                type: 'warmup',
+                calories: 0
+            }, 0);
+            container.appendChild(warmUp);
+            
+            // Add exercises
+            exercises.forEach((exercise, index) => {
+                const element = createExerciseElement(exercise, index + 1);
+                container.appendChild(element);
+            });
+            
+            // Add cool-down
+            const coolDown = createExerciseElement({
+                name: '🧘 Заминка',
+                description: 'Статическая растяжка основных мышечных групп - 5-10 минут',
+                type: 'cooldown',
+                calories: 0
+            }, exercises.length + 1);
+            container.appendChild(coolDown);
+            
+            // Show workout display section
+            const workoutDisplay = document.getElementById('workoutDisplay');
+            if (workoutDisplay) {
+                workoutDisplay.classList.remove('hidden');
+                workoutDisplay.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Update workout info
+            updateWorkoutInfo(workoutData);
+        }
+
+        function createExerciseElement(exercise, index) {
+            const div = document.createElement('div');
+            div.className = 'exercise-card mb-4 fade-in';
+            div.style.animationDelay = `${index * 0.1}s`;
+            
+            const isSpecial = exercise.type === 'warmup' || exercise.type === 'cooldown';
+            const bgClass = exercise.type === 'warmup' ? 'from-orange-500 to-red-500' : 
+                           exercise.type === 'cooldown' ? 'from-teal-500 to-blue-500' : 
+                           'from-gray-700 to-gray-800';
+            
+            if (isSpecial) {
+                div.className = `mb-4 p-4 bg-gradient-to-r ${bgClass} rounded-lg fade-in`;
+                div.innerHTML = `
+                    <h3 class="text-lg font-bold mb-2">${exercise.name}</h3>
+                    <p class="text-sm">${exercise.description}</p>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden">
+                            <img src="${exercise.img}" alt="${exercise.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold">${exercise.name}</h3>
+                            <div class="flex space-x-4 text-sm text-gray-300 mt-1">
+                                <span>${exercise.sets} подхода</span>
+                                <span>${exercise.reps} повторений</span>
+                                <span>Отдых: ${exercise.rest} сек</span>
+                                <span class="text-green-400">🔥 ${exercise.calories} кал</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl">💪</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return div;
+        }
+
+        function updateWorkoutInfo(workoutData) {
+            const now = new Date();
+            
+            const dateElement = document.getElementById('workoutDate');
+            const timeElement = document.getElementById('workoutTime');
+            const durationElement = document.getElementById('totalDuration');
+            
+            if (dateElement) dateElement.textContent = now.toLocaleDateString('ru-RU');
+            if (timeElement) timeElement.textContent = now.toLocaleTimeString('ru-RU');
+            if (durationElement) durationElement.textContent = workoutData.duration + ' мин';
+        }
+
+        // Start workout button
+        document.getElementById('startWorkout').addEventListener('click', function() {
+            alert('Отлично! Начинаем тренировку. Не забудьте разминку! 🔥');
+            // Here you could implement a workout timer or tracking system
+        });
+
+        // Set default selections
+        document.querySelector('.environment-option[data-value="home"]').classList.add('active');
+        document.querySelector('.level-option[data-value="beginner"]').classList.add('active');
+        document.querySelector('.duration-option[data-value="45"]').classList.add('active');
+        document.querySelector('.goal-option[data-value="tone"]').classList.add('active');
+        
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
