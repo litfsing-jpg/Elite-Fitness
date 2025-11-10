@@ -363,22 +363,18 @@
 
     <script>
         // Initialize EmailJS
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Замените на свой ключ
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
 
         let allUsers = [];
         let allWorkouts = [];
 
-        // Таймаут на случай если Firebase долго грузится
-        setTimeout(() => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (!loadingScreen.classList.contains('hidden')) {
-                console.log('Таймаут загрузки - показываем форму входа');
-                loadingScreen.classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-            }
-        }, 3000);
+        // Сразу показываем форму входа
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        });
 
-        // Admin login function
+        // Admin login
         async function adminLogin() {
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
@@ -394,46 +390,32 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('loadingScreen').classList.remove('hidden');
 
-            const result = await loginUser(email, password);
+            try {
+                const result = await loginUser(email, password);
 
-            if (!result.success) {
-                errorDiv.textContent = 'Ошибка входа: ' + result.error;
+                if (!result.success) {
+                    errorDiv.textContent = 'Неверный логин или пароль';
+                    errorDiv.classList.remove('hidden');
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    return;
+                }
+
+                // Загружаем админку
+                const userDataResult = await getUserData(result.user.uid);
+                document.getElementById('adminName').textContent = userDataResult.success ? userDataResult.data.fullName : 'Админ';
+
+                await loadDashboardData();
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            } catch (error) {
+                errorDiv.textContent = 'Ошибка входа: ' + error.message;
                 errorDiv.classList.remove('hidden');
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
-                return;
             }
-
-            // Успешный вход - грузим админку
-            const userDataResult = await getUserData(result.user.uid);
-            const userName = userDataResult.success ? userDataResult.data.fullName : 'Админ';
-
-            document.getElementById('adminName').textContent = userName;
-            await loadDashboardData();
-
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
         }
-
-        // Check if already logged in
-        onAuthStateChanged(async (user) => {
-            if (!user) {
-                // Не залогинен - показываем форму
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
-
-            // Уже залогинен - грузим админку сразу
-            const userDataResult = await getUserData(user.uid);
-            const userName = userDataResult.success ? userDataResult.data.fullName : 'Админ';
-
-            document.getElementById('adminName').textContent = userName;
-            await loadDashboardData();
-
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-        });
 
         async function loadDashboardData() {
             try {
