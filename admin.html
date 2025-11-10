@@ -133,7 +133,7 @@
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loadingScreen">
+    <div id="loadingScreen" class="hidden">
         <div class="text-center">
             <div class="spinner mx-auto mb-4"></div>
             <p class="text-white">Загрузка...</p>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- Login Screen -->
-    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center px-4">
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center px-4">
         <div class="glass-card max-w-md w-full">
             <h1 class="text-3xl font-bold mb-2 text-center">Админ-панель</h1>
             <p class="text-gray-300 text-center mb-8">Войдите для доступа</p>
@@ -367,12 +367,6 @@
 
         let allUsers = [];
         let allWorkouts = [];
-
-        // Сразу показываем форму входа
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-        });
 
         // Admin login
         async function adminLogin() {
