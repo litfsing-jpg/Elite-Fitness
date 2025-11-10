@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Регистрация - Elite Fitness Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.birds.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #ff6b6b;
+            --success: #4ecdc4;
+            --warning: #ffe66d;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .link-text {
+            color: #4ecdc4;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .link-text:hover {
+            color: #ff6b6b;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .input-field.error {
+            border-color: #ff6b6b;
+        }
+
+        .success-icon {
+            display: none;
+            color: #4ecdc4;
+            margin-left: 0.5rem;
+        }
+
+        .success-icon.show {
+            display: inline;
+        }
+
+        @media (max-width: 640px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-20 backdrop-blur-lg border-b border-white border-opacity-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">EF</span>
+                    </div>
+                    <span class="text-xl font-bold">Elite Fitness</span>
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-white hover:text-red-400 transition-colors">Главная</a>
+                    <a href="programs.html" class="text-white hover:text-red-400 transition-colors">Программы</a>
+                    <a href="progress.html" class="text-white hover:text-red-400 transition-colors">Прогресс</a>
+                    <a href="profile.html" class="text-white hover:text-red-400 transition-colors">Профиль</a>
+                </div>
+                <button class="md:hidden text-white mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+
+                <!-- Mobile Menu -->
+                <div class="mobile-menu hidden absolute top-16 left-0 right-0 bg-black bg-opacity-90 backdrop-blur-lg border-t border-white border-opacity-10 md:hidden">
+                    <div class="px-4 py-4 space-y-2">
+                        <a href="index.html" class="block py-2 text-white hover:text-red-400 transition-colors">Главная</a>
+                        <a href="programs.html" class="block py-2 text-white hover:text-red-400 transition-colors">Программы</a>
+                        <a href="progress.html" class="block py-2 text-white hover:text-red-400 transition-colors">Прогресс</a>
+                        <a href="profile.html" class="block py-2 text-white hover:text-red-400 transition-colors">Профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Section -->
+    <section class="hero-section">
+        <div id="vanta-bg" class="animated-bg"></div>
+        <div class="content-overlay">
+            <div class="glass-card fade-in">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-black mb-3">
+                        <span class="gradient-text">Регистрация</span>
+                    </h1>
+                    <p class="text-gray-300">Присоединяйтесь к Elite Fitness и начните свой путь к идеальной форме</p>
+                </div>
+
+                <form id="registrationForm" novalidate>
+                    <div class="input-group">
+                        <label class="input-label" for="fullName">
+                            Полное имя
+                        </label>
+                        <input
+                            type="text"
+                            id="fullName"
+                            name="fullName"
+                            class="input-field"
+                            placeholder="Иван Иванов"
+                            required
+                        />
+                        <div class="error-message" id="nameError">Пожалуйста, введите ваше имя</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="email">
+                            Электронная почта
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="input-field"
+                            placeholder="ivan@example.com"
+                            required
+                        />
+                        <div class="error-message" id="emailError">Введите корректный email адрес</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="password">
+                            Пароль
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="input-field"
+                            placeholder="Минимум 6 символов"
+                            required
+                            minlength="6"
+                        />
+                        <div class="error-message" id="passwordError">Пароль должен содержать минимум 6 символов</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="confirmPassword">
+                            Подтвердите пароль
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            class="input-field"
+                            placeholder="Повторите пароль"
+                            required
+                        />
+                        <div class="error-message" id="confirmPasswordError">Пароли не совпадают</div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        Зарегистрироваться
+                    </button>
+                </form>
+
+                <div class="text-center mt-6">
+                    <p class="text-gray-400 text-sm">
+                        Уже есть аккаунт?
+                        <a href="index.html" class="link-text font-semibold">Войти</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-8 px-4 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-teal-400 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EF</span>
+                </div>
+                <span class="text-xl font-bold">Elite Fitness</span>
+            </div>
+            <p class="text-gray-400">© 2025 Elite Fitness Planner. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.BIRDS({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            backgroundColor: 0x1a1a2e,
+            color1: 0xff6b6b,
+            color2: 0x4ecdc4,
+            colorMode: "lerpGradient",
+            birdSize: 1.20,
+            wingSpan: 25.00,
+            speedLimit: 4.00,
+            separation: 20.00,
+            alignment: 20.00,
+            cohesion: 20.00,
+            quantity: 3.00
+        });
+
+        // Form validation and submission
+        const form = document.getElementById('registrationForm');
+        const fullName = document.getElementById('fullName');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+
+        // Validation functions
+        function validateName() {
+            const value = fullName.value.trim();
+            if (value.length < 2) {
+                showError('fullName', 'nameError', 'Пожалуйста, введите ваше полное имя');
+                return false;
+            }
+            hideError('fullName', 'nameError');
+            return true;
+        }
+
+        function validateEmail() {
+            const value = email.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                showError('email', 'emailError', 'Введите корректный email адрес');
+                return false;
+            }
+            hideError('email', 'emailError');
+            return true;
+        }
+
+        function validatePassword() {
+            const value = password.value;
+            if (value.length < 6) {
+                showError('password', 'passwordError', 'Пароль должен содержать минимум 6 символов');
+                return false;
+            }
+            hideError('password', 'passwordError');
+            return true;
+        }
+
+        function validateConfirmPassword() {
+            const value = confirmPassword.value;
+            if (value !== password.value) {
+                showError('confirmPassword', 'confirmPasswordError', 'Пароли не совпадают');
+                return false;
+            }
+            hideError('confirmPassword', 'confirmPasswordError');
+            return true;
+        }
+
+        function showError(inputId, errorId, message) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            input.classList.add('error');
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        function hideError(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            input.classList.remove('error');
+            error.classList.remove('show');
+        }
+
+        // Real-time validation
+        fullName.addEventListener('blur', validateName);
+        email.addEventListener('blur', validateEmail);
+        password.addEventListener('blur', validatePassword);
+        confirmPassword.addEventListener('blur', validateConfirmPassword);
+        password.addEventListener('input', function() {
+            if (confirmPassword.value) {
+                validateConfirmPassword();
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate all fields
+            const isNameValid = validateName();
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            const isConfirmPasswordValid = validateConfirmPassword();
+
+            if (isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
+                // Save to localStorage
+                const userData = {
+                    fullName: fullName.value.trim(),
+                    email: email.value.trim(),
+                    registrationDate: new Date().toISOString(),
+                    isRegistered: true
+                };
+
+                localStorage.setItem('eliteFitnessUser', JSON.stringify(userData));
+
+                // Show success message
+                showSuccessMessage();
+
+                // Redirect to main page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        });
+
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.className = 'fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm bg-green-500 text-white';
+            message.style.animation = 'fadeIn 0.3s ease-out';
+
+            message.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span>✅ Регистрация успешна! Перенаправление...</span>
+                </div>
+            `;
+
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.remove();
+            }, 2500);
+        }
+
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
