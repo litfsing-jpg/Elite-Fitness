@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Тест Firebase - Elite Fitness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .test-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
+        .status-ok {
+            color: #4ecdc4;
+        }
+        .status-error {
+            color: #ff6b6b;
+        }
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-8">🔥 Тест Firebase</h1>
+
+        <!-- Connection Test -->
+        <div class="test-box">
+            <h2 class="text-2xl font-bold mb-4">1. Подключение к Firebase</h2>
+            <div id="connectionStatus">Проверка...</div>
+        </div>
+
+        <!-- Auth Test -->
+        <div class="test-box">
+            <h2 class="text-2xl font-bold mb-4">2. Тест Authentication</h2>
+            <div class="mb-4">
+                <input type="email" id="testEmail" placeholder="test@example.com"
+                       class="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 w-full mb-2">
+                <input type="password" id="testPassword" placeholder="password123"
+                       class="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 w-full mb-2">
+                <button onclick="testRegister()" class="btn">Зарегистрироваться</button>
+                <button onclick="testLogin()" class="btn">Войти</button>
+            </div>
+            <div id="authStatus"></div>
+        </div>
+
+        <!-- Firestore Test -->
+        <div class="test-box">
+            <h2 class="text-2xl font-bold mb-4">3. Тест Firestore</h2>
+            <button onclick="testFirestore()" class="btn">Записать данные</button>
+            <button onclick="testFirestoreRead()" class="btn">Прочитать данные</button>
+            <div id="firestoreStatus" class="mt-4"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="test-box">
+            <h2 class="text-2xl font-bold mb-4">Результаты:</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <!-- Firebase Config & Service -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
+
+    <script>
+        let testResults = {
+            connection: false,
+            auth: false,
+            firestore: false
+        };
+
+        // Test 1: Connection
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                    document.getElementById('connectionStatus').innerHTML =
+                        '<span class="status-ok">✅ Firebase подключен успешно!</span><br>' +
+                        '<small>Project ID: ' + firebaseApp.options.projectId + '</small>';
+                    testResults.connection = true;
+                } else {
+                    document.getElementById('connectionStatus').innerHTML =
+                        '<span class="status-error">❌ Ошибка подключения к Firebase</span>';
+                }
+                updateResults();
+            }, 1000);
+        });
+
+        // Test 2: Registration
+        async function testRegister() {
+            const email = document.getElementById('testEmail').value || 'test@example.com';
+            const password = document.getElementById('testPassword').value || 'password123';
+
+            document.getElementById('authStatus').innerHTML = 'Регистрация...';
+
+            try {
+                const result = await registerUser(email, password, 'Тестовый Пользователь', {
+                    age: 25,
+                    gender: 'male',
+                    height: 180,
+                    currentWeight: 75
+                });
+
+                if (result.success) {
+                    document.getElementById('authStatus').innerHTML =
+                        '<span class="status-ok">✅ Регистрация успешна!</span><br>' +
+                        '<small>User ID: ' + result.user.uid + '</small>';
+                    testResults.auth = true;
+                } else {
+                    document.getElementById('authStatus').innerHTML =
+                        '<span class="status-error">❌ Ошибка: ' + result.error + '</span>';
+                }
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML =
+                    '<span class="status-error">❌ Ошибка: ' + error.message + '</span>';
+            }
+            updateResults();
+        }
+
+        // Test 2b: Login
+        async function testLogin() {
+            const email = document.getElementById('testEmail').value || 'test@example.com';
+            const password = document.getElementById('testPassword').value || 'password123';
+
+            document.getElementById('authStatus').innerHTML = 'Вход...';
+
+            try {
+                const result = await loginUser(email, password);
+
+                if (result.success) {
+                    document.getElementById('authStatus').innerHTML =
+                        '<span class="status-ok">✅ Вход выполнен!</span><br>' +
+                        '<small>User ID: ' + result.user.uid + '</small>';
+                    testResults.auth = true;
+                } else {
+                    document.getElementById('authStatus').innerHTML =
+                        '<span class="status-error">❌ Ошибка: ' + result.error + '</span>';
+                }
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML =
+                    '<span class="status-error">❌ Ошибка: ' + error.message + '</span>';
+            }
+            updateResults();
+        }
+
+        // Test 3: Firestore Write
+        async function testFirestore() {
+            const user = getCurrentUser();
+            if (!user) {
+                document.getElementById('firestoreStatus').innerHTML =
+                    '<span class="status-error">❌ Сначала войдите!</span>';
+                return;
+            }
+
+            document.getElementById('firestoreStatus').innerHTML = 'Запись в Firestore...';
+
+            try {
+                const result = await addWorkout(user.uid, {
+                    program: 'Тестовая программа',
+                    duration: 30,
+                    date: new Date().toISOString(),
+                    completed: true
+                });
+
+                if (result.success) {
+                    document.getElementById('firestoreStatus').innerHTML =
+                        '<span class="status-ok">✅ Данные записаны в Firestore!</span><br>' +
+                        '<small>Workout ID: ' + result.id + '</small>';
+                    testResults.firestore = true;
+                } else {
+                    document.getElementById('firestoreStatus').innerHTML =
+                        '<span class="status-error">❌ Ошибка: ' + result.error + '</span>';
+                }
+            } catch (error) {
+                document.getElementById('firestoreStatus').innerHTML =
+                    '<span class="status-error">❌ Ошибка: ' + error.message + '</span>';
+            }
+            updateResults();
+        }
+
+        // Test 3b: Firestore Read
+        async function testFirestoreRead() {
+            const user = getCurrentUser();
+            if (!user) {
+                document.getElementById('firestoreStatus').innerHTML =
+                    '<span class="status-error">❌ Сначала войдите!</span>';
+                return;
+            }
+
+            document.getElementById('firestoreStatus').innerHTML = 'Чтение из Firestore...';
+
+            try {
+                const result = await getUserWorkouts(user.uid);
+
+                if (result.success) {
+                    document.getElementById('firestoreStatus').innerHTML =
+                        '<span class="status-ok">✅ Данные прочитаны из Firestore!</span><br>' +
+                        '<small>Найдено тренировок: ' + result.data.length + '</small>';
+                    testResults.firestore = true;
+                } else {
+                    document.getElementById('firestoreStatus').innerHTML =
+                        '<span class="status-error">❌ Ошибка: ' + result.error + '</span>';
+                }
+            } catch (error) {
+                document.getElementById('firestoreStatus').innerHTML =
+                    '<span class="status-error">❌ Ошибка: ' + error.message + '</span>';
+            }
+            updateResults();
+        }
+
+        function updateResults() {
+            const total = Object.values(testResults).filter(v => v).length;
+            const resultsDiv = document.getElementById('results');
+
+            let html = '<div class="space-y-2">';
+            html += '<div>' + (testResults.connection ? '✅' : '⏳') + ' Firebase подключение</div>';
+            html += '<div>' + (testResults.auth ? '✅' : '⏳') + ' Authentication</div>';
+            html += '<div>' + (testResults.firestore ? '✅' : '⏳') + ' Firestore Database</div>';
+            html += '</div>';
+            html += '<div class="mt-4 text-2xl font-bold">';
+            html += 'Пройдено: ' + total + '/3';
+            html += '</div>';
+
+            if (total === 3) {
+                html += '<div class="mt-4 text-green-400 text-xl">🎉 Всё работает отлично!</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
