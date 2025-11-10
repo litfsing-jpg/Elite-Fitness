@@ -139,6 +139,37 @@
         </div>
     </div>
 
+    <!-- Login Screen -->
+    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center px-4">
+        <div class="glass-card max-w-md w-full">
+            <h1 class="text-3xl font-bold mb-2 text-center">Админ-панель</h1>
+            <p class="text-gray-300 text-center mb-8">Войдите для доступа</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="adminEmail"
+                           class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                           placeholder="admin@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Пароль</label>
+                    <input type="password" id="adminPassword"
+                           class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                           placeholder="••••••••"
+                           onkeypress="if(event.key === 'Enter') adminLogin()">
+                </div>
+
+                <div id="loginError" class="text-red-400 text-sm hidden"></div>
+
+                <button onclick="adminLogin()" class="btn-primary w-full">
+                    Войти
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div id="mainContent" class="hidden">
         <!-- Header -->
@@ -336,22 +367,72 @@
         let allUsers = [];
         let allWorkouts = [];
 
+        // Admin login function
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!email || !password) {
+                errorDiv.textContent = 'Заполните все поля';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('loadingScreen').classList.remove('hidden');
+
+            const result = await loginUser(email, password);
+
+            if (!result.success) {
+                errorDiv.textContent = 'Ошибка входа: ' + result.error;
+                errorDiv.classList.remove('hidden');
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                return;
+            }
+
+            // Check if admin
+            const userDataResult = await getUserData(result.user.uid);
+            if (!userDataResult.success || !userDataResult.data.isAdmin) {
+                errorDiv.textContent = 'У вас нет прав доступа к админ-панели';
+                errorDiv.classList.remove('hidden');
+                await logoutUser();
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                return;
+            }
+
+            // Load admin dashboard
+            await loadAdminDashboard(userDataResult.data);
+        }
+
         // Check admin auth
         onAuthStateChanged(async (user) => {
             if (!user) {
-                window.location.href = 'register.html';
+                // Show login screen
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
                 return;
             }
 
             // Check if user is admin
             const userDataResult = await getUserData(user.uid);
             if (!userDataResult.success || !userDataResult.data.isAdmin) {
-                alert('У вас нет прав доступа к админ-панели');
-                window.location.href = 'index.html';
+                // Not admin, show login
+                await logoutUser();
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
                 return;
             }
 
-            document.getElementById('adminName').textContent = userDataResult.data.fullName || 'Админ';
+            // Load admin dashboard
+            await loadAdminDashboard(userDataResult.data);
+        });
+
+        async function loadAdminDashboard(userData) {
+            document.getElementById('adminName').textContent = userData.fullName || 'Админ';
 
             // Load dashboard data
             await loadDashboardData();
@@ -359,7 +440,7 @@
             // Hide loading, show content
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
-        });
+        }
 
         async function loadDashboardData() {
             try {
