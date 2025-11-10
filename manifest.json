@@ -1,0 +1,25 @@
+{
+  "name": "Elite Fitness",
+  "short_name": "Elite Fitness",
+  "description": "Персональный планировщик фитнес-тренировок",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f0c29",
+  "theme_color": "#ff6b6b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "gcm_sender_id": "103953800507"
+}

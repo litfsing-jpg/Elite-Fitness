@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Админ-панель - Elite Fitness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #ff6b6b;
+            --success: #4ecdc4;
+            --warning: #ffe66d;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(78, 205, 196, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .table-row {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+        }
+
+        .badge-warning {
+            background: rgba(255, 230, 109, 0.2);
+            color: #ffe66d;
+        }
+
+        .badge-danger {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #ff6b6b;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-white">Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden">
+        <!-- Header -->
+        <header class="py-6 px-4 border-b border-white border-opacity-10">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">Админ-панель</h1>
+                    <p class="text-gray-300 text-sm mt-1">Elite Fitness Dashboard</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-300" id="adminName">Админ</span>
+                    <button onclick="logout()" class="btn-primary">Выйти</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="py-8 px-4">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Статистика</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Total Users -->
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">Всего пользователей</span>
+                            <span class="text-2xl">👥</span>
+                        </div>
+                        <div class="text-3xl font-bold" id="totalUsers">0</div>
+                        <div class="text-xs text-gray-400 mt-2">+<span id="newUsersToday">0</span> сегодня</div>
+                    </div>
+
+                    <!-- Total Workouts -->
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">Всего тренировок</span>
+                            <span class="text-2xl">💪</span>
+                        </div>
+                        <div class="text-3xl font-bold" id="totalWorkouts">0</div>
+                        <div class="text-xs text-gray-400 mt-2">+<span id="workoutsToday">0</span> сегодня</div>
+                    </div>
+
+                    <!-- Active Users -->
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">Активные (7 дней)</span>
+                            <span class="text-2xl">🔥</span>
+                        </div>
+                        <div class="text-3xl font-bold" id="activeUsers">0</div>
+                        <div class="text-xs text-gray-400 mt-2"><span id="activePercent">0</span>% от всех</div>
+                    </div>
+
+                    <!-- Avg Workouts -->
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">Среднее тренировок</span>
+                            <span class="text-2xl">📊</span>
+                        </div>
+                        <div class="text-3xl font-bold" id="avgWorkouts">0</div>
+                        <div class="text-xs text-gray-400 mt-2">на пользователя</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="py-8 px-4">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- User Growth Chart -->
+                    <div class="glass-card">
+                        <h3 class="text-xl font-bold mb-4">Рост пользователей</h3>
+                        <div id="userGrowthChart" style="width:100%; height:300px;"></div>
+                    </div>
+
+                    <!-- Workout Activity Chart -->
+                    <div class="glass-card">
+                        <h3 class="text-xl font-bold mb-4">Активность тренировок</h3>
+                        <div id="workoutActivityChart" style="width:100%; height:300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Table -->
+        <section class="py-8 px-4">
+            <div class="max-w-7xl mx-auto">
+                <div class="glass-card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Пользователи</h2>
+                        <input type="text" id="searchUsers" placeholder="Поиск..."
+                               class="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-gray-300 text-sm border-b border-white border-opacity-20">
+                                    <th class="pb-3 px-4">Пользователь</th>
+                                    <th class="pb-3 px-4">Email</th>
+                                    <th class="pb-3 px-4">Тренировки</th>
+                                    <th class="pb-3 px-4">Регистрация</th>
+                                    <th class="pb-3 px-4">Статус</th>
+                                    <th class="pb-3 px-4">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Заполняется динамически -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Email Campaign -->
+        <section class="py-8 px-4">
+            <div class="max-w-7xl mx-auto">
+                <div class="glass-card">
+                    <h2 class="text-2xl font-bold mb-6">Email-рассылка</h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Тема письма</label>
+                            <input type="text" id="emailSubject"
+                                   class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                                   placeholder="Не забудьте о тренировке!">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Текст письма</label>
+                            <textarea id="emailBody" rows="6"
+                                      class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                                      placeholder="Привет! Пора размяться..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Кому отправить</label>
+                            <select id="emailRecipients"
+                                    class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white">
+                                <option value="all">Всем пользователям</option>
+                                <option value="active">Только активным</option>
+                                <option value="inactive">Неактивным (7+ дней)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="sendEmailCampaign()" class="btn-primary">
+                            Отправить рассылку 📧
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Push Notifications -->
+        <section class="py-8 px-4">
+            <div class="max-w-7xl mx-auto">
+                <div class="glass-card">
+                    <h2 class="text-2xl font-bold mb-6">Push-уведомления</h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Заголовок уведомления</label>
+                            <input type="text" id="pushTitle"
+                                   class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                                   placeholder="Elite Fitness">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Текст уведомления</label>
+                            <textarea id="pushBody" rows="3"
+                                      class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-2 text-white"
+                                      placeholder="Пора тренироваться!"></textarea>
+                        </div>
+
+                        <button onclick="sendPushNotification()" class="btn-primary">
+                            Отправить уведомление 🔔
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Firebase Config & Service -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
+
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Замените на свой ключ
+
+        let allUsers = [];
+        let allWorkouts = [];
+
+        // Check admin auth
+        onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'register.html';
+                return;
+            }
+
+            // Check if user is admin
+            const userDataResult = await getUserData(user.uid);
+            if (!userDataResult.success || !userDataResult.data.isAdmin) {
+                alert('У вас нет прав доступа к админ-панели');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('adminName').textContent = userDataResult.data.fullName || 'Админ';
+
+            // Load dashboard data
+            await loadDashboardData();
+
+            // Hide loading, show content
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Get all users
+                const usersResult = await getAllUsers();
+                if (usersResult.success) {
+                    allUsers = usersResult.data;
+                }
+
+                // Get all workouts
+                const querySnapshot = await firebaseDB.collection('workouts').get();
+                allWorkouts = [];
+                querySnapshot.forEach((doc) => {
+                    allWorkouts.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Update stats
+                updateStats();
+                updateCharts();
+                updateUsersTable();
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateStats() {
+            const totalUsers = allUsers.length;
+            const totalWorkouts = allWorkouts.length;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const newUsersToday = allUsers.filter(u => {
+                if (!u.createdAt) return false;
+                const created = u.createdAt.toDate ? u.createdAt.toDate() : new Date(u.createdAt);
+                return created >= today;
+            }).length;
+
+            const workoutsToday = allWorkouts.filter(w => {
+                if (!w.date) return false;
+                const workoutDate = new Date(w.date);
+                return workoutDate >= today;
+            }).length;
+
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            const activeUsers = allUsers.filter(u => {
+                if (!u.lastLogin) return false;
+                const lastLogin = u.lastLogin.toDate ? u.lastLogin.toDate() : new Date(u.lastLogin);
+                return lastLogin >= sevenDaysAgo;
+            }).length;
+
+            const avgWorkouts = totalUsers > 0 ? (totalWorkouts / totalUsers).toFixed(1) : 0;
+            const activePercent = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalWorkouts').textContent = totalWorkouts;
+            document.getElementById('newUsersToday').textContent = newUsersToday;
+            document.getElementById('workoutsToday').textContent = workoutsToday;
+            document.getElementById('activeUsers').textContent = activeUsers;
+            document.getElementById('activePercent').textContent = activePercent;
+            document.getElementById('avgWorkouts').textContent = avgWorkouts;
+        }
+
+        function updateCharts() {
+            // User Growth Chart
+            const usersByDate = {};
+            allUsers.forEach(user => {
+                if (!user.createdAt) return;
+                const date = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
+                const dateStr = date.toISOString().split('T')[0];
+                usersByDate[dateStr] = (usersByDate[dateStr] || 0) + 1;
+            });
+
+            const sortedDates = Object.keys(usersByDate).sort();
+            let cumulative = 0;
+            const cumulativeData = sortedDates.map(date => {
+                cumulative += usersByDate[date];
+                return cumulative;
+            });
+
+            const userGrowthData = [{
+                x: sortedDates,
+                y: cumulativeData,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: { color: '#ff6b6b' },
+                line: { color: '#ff6b6b', width: 3 }
+            }];
+
+            const userGrowthLayout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#ffffff' },
+                xaxis: { gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { gridcolor: 'rgba(255,255,255,0.1)' },
+                margin: { t: 20, b: 40, l: 40, r: 20 }
+            };
+
+            Plotly.newPlot('userGrowthChart', userGrowthData, userGrowthLayout, { responsive: true });
+
+            // Workout Activity Chart
+            const workoutsByDate = {};
+            allWorkouts.forEach(workout => {
+                if (!workout.date) return;
+                const date = new Date(workout.date);
+                const dateStr = date.toISOString().split('T')[0];
+                workoutsByDate[dateStr] = (workoutsByDate[dateStr] || 0) + 1;
+            });
+
+            const workoutDates = Object.keys(workoutsByDate).sort().slice(-14);
+            const workoutCounts = workoutDates.map(date => workoutsByDate[date]);
+
+            const workoutActivityData = [{
+                x: workoutDates,
+                y: workoutCounts,
+                type: 'bar',
+                marker: { color: '#4ecdc4' }
+            }];
+
+            const workoutActivityLayout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#ffffff' },
+                xaxis: { gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { gridcolor: 'rgba(255,255,255,0.1)' },
+                margin: { t: 20, b: 40, l: 40, r: 20 }
+            };
+
+            Plotly.newPlot('workoutActivityChart', workoutActivityData, workoutActivityLayout, { responsive: true });
+        }
+
+        function updateUsersTable(searchTerm = '') {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            const filteredUsers = allUsers.filter(user => {
+                if (!searchTerm) return true;
+                const search = searchTerm.toLowerCase();
+                return (user.fullName || '').toLowerCase().includes(search) ||
+                       (user.email || '').toLowerCase().includes(search);
+            });
+
+            filteredUsers.forEach(user => {
+                const userWorkouts = allWorkouts.filter(w => w.userId === user.id).length;
+
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+                let status = 'inactive';
+                if (user.lastLogin) {
+                    const lastLogin = user.lastLogin.toDate ? user.lastLogin.toDate() : new Date(user.lastLogin);
+                    status = lastLogin >= sevenDaysAgo ? 'active' : 'inactive';
+                }
+
+                const regDate = user.createdAt ?
+                    (user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt)).toLocaleDateString('ru-RU') :
+                    'Неизвестно';
+
+                const row = document.createElement('tr');
+                row.className = 'table-row';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${user.fullName || 'Без имени'}</td>
+                    <td class="py-3 px-4">${user.email || 'Нет email'}</td>
+                    <td class="py-3 px-4">${userWorkouts}</td>
+                    <td class="py-3 px-4 text-sm text-gray-400">${regDate}</td>
+                    <td class="py-3 px-4">
+                        <span class="badge ${status === 'active' ? 'badge-success' : 'badge-warning'}">
+                            ${status === 'active' ? 'Активен' : 'Неактивен'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button onclick="viewUserDetails('${user.id}')"
+                                class="text-blue-400 hover:text-blue-300 text-sm">
+                            Подробнее
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function viewUserDetails(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            const userWorkouts = allWorkouts.filter(w => w.userId === userId);
+
+            alert(`Пользователь: ${user.fullName}\nEmail: ${user.email}\nВсего тренировок: ${userWorkouts.length}`);
+        }
+
+        async function sendEmailCampaign() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const recipients = document.getElementById('emailRecipients').value;
+
+            if (!subject || !body) {
+                alert('Заполните тему и текст письма');
+                return;
+            }
+
+            let targetUsers = allUsers;
+
+            if (recipients === 'active') {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                targetUsers = allUsers.filter(u => {
+                    if (!u.lastLogin) return false;
+                    const lastLogin = u.lastLogin.toDate ? u.lastLogin.toDate() : new Date(u.lastLogin);
+                    return lastLogin >= sevenDaysAgo;
+                });
+            } else if (recipients === 'inactive') {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                targetUsers = allUsers.filter(u => {
+                    if (!u.lastLogin) return true;
+                    const lastLogin = u.lastLogin.toDate ? u.lastLogin.toDate() : new Date(u.lastLogin);
+                    return lastLogin < sevenDaysAgo;
+                });
+            }
+
+            if (confirm(`Отправить письмо ${targetUsers.length} пользователям?`)) {
+                alert(`Email-рассылка отправляется ${targetUsers.length} пользователям...\n\nВ реальной версии здесь будет интеграция с EmailJS или SendGrid.`);
+                // TODO: Интеграция с EmailJS
+            }
+        }
+
+        async function sendPushNotification() {
+            const title = document.getElementById('pushTitle').value;
+            const body = document.getElementById('pushBody').value;
+
+            if (!title || !body) {
+                alert('Заполните заголовок и текст уведомления');
+                return;
+            }
+
+            alert(`Push-уведомление отправляется...\n\nВ реальной версии здесь будет интеграция с Firebase Cloud Messaging.`);
+            // TODO: Интеграция с FCM
+        }
+
+        async function logout() {
+            await logoutUser();
+            window.location.href = 'register.html';
+        }
+
+        // Search functionality
+        document.getElementById('searchUsers').addEventListener('input', (e) => {
+            updateUsersTable(e.target.value);
+        });
+    </script>
+</body>
+</html>
