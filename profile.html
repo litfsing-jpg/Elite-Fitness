@@ -253,20 +253,20 @@
                 <div class="profile-avatar">
                     АК
                 </div>
-                <h1 class="text-3xl font-bold mb-2">Алексей Константинов</h1>
-                <p class="text-gray-300 mb-4">Фитнес энтузиаст • На платформе с января 2025</p>
-                
+                <h1 class="text-3xl font-bold mb-2" id="profileName">Ваше имя</h1>
+                <p class="text-gray-300 mb-4" id="profileStatus">Фитнес энтузиаст • На платформе с <span id="registrationDate">...</span></p>
+
                 <div class="flex justify-center space-x-8 text-sm">
                     <div>
-                        <div class="text-2xl font-bold text-red-400">127</div>
+                        <div class="text-2xl font-bold text-red-400" id="totalWorkouts">0</div>
                         <div class="text-gray-300">Тренировок</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-teal-400">89%</div>
+                        <div class="text-2xl font-bold text-teal-400" id="successRate">0%</div>
                         <div class="text-gray-300">Успех</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-yellow-400">45</div>
+                        <div class="text-2xl font-bold text-yellow-400" id="streakDays">0</div>
                         <div class="text-gray-300">Дней подряд</div>
                     </div>
                 </div>
@@ -470,7 +470,52 @@
         // Load user data from localStorage
         function loadUserData() {
             const userData = JSON.parse(localStorage.getItem('eliteFitnessUser') || '{}');
-            const profileData = JSON.parse(localStorage.getItem('eliteFitnessProfile') || '{}');
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+            const workoutHistory = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+
+            // Update profile statistics
+            document.getElementById('totalWorkouts').textContent = workoutHistory.length;
+
+            // Calculate success rate (completed workouts)
+            const completedWorkouts = workoutHistory.filter(w => w.completed !== false).length;
+            const successRate = workoutHistory.length > 0 ? Math.round((completedWorkouts / workoutHistory.length) * 100) : 0;
+            document.getElementById('successRate').textContent = successRate + '%';
+
+            // Calculate streak (consecutive days)
+            let streakDays = 0;
+            if (workoutHistory.length > 0) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const sortedWorkouts = workoutHistory
+                    .map(w => new Date(w.date))
+                    .sort((a, b) => b - a);
+
+                let currentDate = new Date(today);
+                for (let workout of sortedWorkouts) {
+                    const workoutDate = new Date(workout);
+                    workoutDate.setHours(0, 0, 0, 0);
+
+                    const diffDays = Math.floor((currentDate - workoutDate) / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 0 || diffDays === 1) {
+                        streakDays++;
+                        currentDate = new Date(workoutDate);
+                    } else {
+                        break;
+                    }
+                }
+            }
+            document.getElementById('streakDays').textContent = streakDays;
+
+            // Show registration date
+            if (userData.registrationDate) {
+                const regDate = new Date(userData.registrationDate);
+                const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                document.getElementById('registrationDate').textContent = months[regDate.getMonth()] + ' ' + regDate.getFullYear();
+            } else {
+                document.getElementById('registrationDate').textContent = 'недавно';
+            }
 
             // Personal Information
             if (userData.fullName) {
@@ -488,10 +533,7 @@
                 }
 
                 // Update header name
-                const headerName = document.querySelector('h1.text-3xl');
-                if (headerName) {
-                    headerName.textContent = userData.fullName;
-                }
+                document.getElementById('profileName').textContent = userData.fullName;
             }
 
             if (userData.email) {
@@ -502,11 +544,21 @@
             if (profileData.age) document.querySelector('input[type="number"]').value = profileData.age;
             if (profileData.gender) document.querySelector('select').value = profileData.gender;
             if (profileData.height) document.querySelectorAll('input[type="number"]')[1].value = profileData.height;
-            if (profileData.weight) document.querySelectorAll('input[type="number"]')[2].value = profileData.weight;
+            if (profileData.currentWeight) document.querySelectorAll('input[type="number"]')[2].value = profileData.currentWeight;
             if (profileData.goal) document.querySelectorAll('select')[1].value = profileData.goal;
             if (profileData.targetWeight) document.querySelectorAll('input[type="number"]')[3].value = profileData.targetWeight;
             if (profileData.activityLevel) document.querySelectorAll('select')[2].value = profileData.activityLevel;
             if (profileData.preferredTime) document.querySelectorAll('select')[3].value = profileData.preferredTime;
+
+            // Make all input fields readonly by default
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                if (input.tagName === 'SELECT') {
+                    input.setAttribute('disabled', true);
+                } else {
+                    input.setAttribute('readonly', true);
+                }
+            });
         }
 
         function enableEditing() {
@@ -537,19 +589,19 @@
             userData.email = email;
             localStorage.setItem('eliteFitnessUser', JSON.stringify(userData));
 
-            const profileData = {
-                age: age,
-                gender: gender,
-                height: height,
-                weight: weight
-            };
-            localStorage.setItem('eliteFitnessProfile', JSON.stringify(profileData));
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+            profileData.age = age;
+            profileData.gender = gender;
+            profileData.height = height;
+            profileData.currentWeight = weight;
+            localStorage.setItem('profileData', JSON.stringify(profileData));
 
             const inputs = document.querySelectorAll('.input-field');
             inputs.forEach(input => {
-                input.setAttribute('readonly', true);
                 if (input.tagName === 'SELECT') {
                     input.setAttribute('disabled', true);
+                } else {
+                    input.setAttribute('readonly', true);
                 }
             });
 
@@ -568,27 +620,66 @@
             const preferredTime = document.querySelectorAll('select')[3].value;
 
             // Save to localStorage
-            const profileData = JSON.parse(localStorage.getItem('eliteFitnessProfile') || '{}');
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
             profileData.goal = goal;
             profileData.targetWeight = targetWeight;
             profileData.activityLevel = activityLevel;
             profileData.preferredTime = preferredTime;
-            localStorage.setItem('eliteFitnessProfile', JSON.stringify(profileData));
+            localStorage.setItem('profileData', JSON.stringify(profileData));
 
             alert('Цели обновлены! Мы подберем новую программу под ваши цели. 🎯');
         }
-        
+
         function toggleSwitch(element) {
             element.classList.toggle('active');
         }
-        
+
         function exportData() {
-            alert('Данные экспортируются... 📊\n\nВаши данные будут отправлены на email в формате CSV.');
+            // Gather all user data
+            const userData = JSON.parse(localStorage.getItem('eliteFitnessUser') || '{}');
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+            const workoutHistory = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+
+            // Create export object
+            const exportObj = {
+                user: userData,
+                profile: profileData,
+                workouts: workoutHistory,
+                exportDate: new Date().toISOString()
+            };
+
+            // Convert to JSON
+            const dataStr = JSON.stringify(exportObj, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+            // Create download link
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `elite-fitness-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('Данные экспортированы! 📊\n\nФайл сохранен на ваше устройство.');
         }
-        
+
         function deleteAccount() {
-            if (confirm('Вы уверены, что хотите удалить аккаунт? Это действие необратимо!')) {
-                alert('Аккаунт будет удален через 30 дней. Вы можете отменить удаление в любой момент.');
+            if (confirm('Вы уверены, что хотите удалить аккаунт? Это действие необратимо!\n\nВсе ваши данные будут удалены безвозвратно.')) {
+                if (confirm('Последнее предупреждение! Вы точно хотите удалить все данные?')) {
+                    // Clear all localStorage data
+                    localStorage.removeItem('eliteFitnessUser');
+                    localStorage.removeItem('profileData');
+                    localStorage.removeItem('workoutHistory');
+
+                    alert('Аккаунт удален. Перенаправление на главную страницу...');
+
+                    // Redirect to index page
+                    setTimeout(() => {
+                        window.location.href = 'register.html';
+                    }, 1500);
+                }
             }
         }
         
