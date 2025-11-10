@@ -899,58 +899,71 @@
 
         // Initialize charts
         function initCharts() {
+            // Get workout history from localStorage
+            const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+
             // Progress Chart
-            const progressData = [{
-                x: ['Неделя 1', 'Неделя 2', 'Неделя 3', 'Неделя 4', 'Неделя 5', 'Неделя 6'],
-                y: [100, 115, 125, 140, 155, 170],
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Сила',
-                line: {color: '#ff6b6b', width: 3},
-                marker: {color: '#ff6b6b', size: 8}
-            }, {
-                x: ['Неделя 1', 'Неделя 2', 'Неделя 3', 'Неделя 4', 'Неделя 5', 'Неделя 6'],
-                y: [100, 108, 115, 125, 135, 145],
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Выносливость',
-                line: {color: '#4ecdc4', width: 3},
-                marker: {color: '#4ecdc4', size: 8}
-            }];
+            const progressChartDiv = document.getElementById('progressChart');
 
-            const progressLayout = {
-                title: '',
-                xaxis: {title: 'Недели', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
-                yaxis: {title: 'Прогресс (%)', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                font: {color: '#ffffff'},
-                legend: {font: {color: '#ffffff'}}
-            };
+            if (history.length === 0) {
+                // Show empty state
+                progressChartDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                        <div class="text-6xl mb-4">📊</div>
+                        <p class="text-lg font-semibold mb-2">Пока нет данных</p>
+                        <p class="text-sm text-center">Начните тренироваться, чтобы увидеть свой прогресс</p>
+                    </div>
+                `;
+            } else {
+                // Calculate real progress data from workout history
+                const weeklyData = {};
+                history.forEach(workout => {
+                    const date = new Date(workout.date);
+                    const weekNum = Math.floor((Date.now() - date) / (7 * 24 * 60 * 60 * 1000));
+                    const weekKey = `Неделя ${Math.max(1, 6 - weekNum)}`;
 
-            Plotly.newPlot('progressChart', progressData, progressLayout, {responsive: true});
+                    if (!weeklyData[weekKey]) {
+                        weeklyData[weekKey] = { count: 0, totalDuration: 0 };
+                    }
+                    weeklyData[weekKey].count++;
+                    weeklyData[weekKey].totalDuration += workout.duration || 0;
+                });
 
-            // Popularity Chart
-            const popularityData = [{
-                values: [35, 25, 20, 15, 5],
-                labels: ['Похудение', 'Набор массы', 'Тонус', 'Сила', 'Функциональность'],
-                type: 'pie',
-                marker: {
-                    colors: ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff8e8e', '#6c5ce7']
-                },
-                textinfo: 'label+percent',
-                textfont: {color: '#ffffff'}
-            }];
+                const weeks = Object.keys(weeklyData).sort();
+                const progressValues = weeks.map((week, index) => 100 + (weeklyData[week].count * 10));
 
-            const popularityLayout = {
-                title: '',
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                font: {color: '#ffffff'},
-                showlegend: false
-            };
+                const progressData = [{
+                    x: weeks,
+                    y: progressValues,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Прогресс',
+                    line: {color: '#ff6b6b', width: 3},
+                    marker: {color: '#ff6b6b', size: 8}
+                }];
 
-            Plotly.newPlot('popularityChart', popularityData, popularityLayout, {responsive: true});
+                const progressLayout = {
+                    title: '',
+                    xaxis: {title: 'Период', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
+                    yaxis: {title: 'Прогресс (%)', color: '#ffffff', gridcolor: 'rgba(255,255,255,0.1)'},
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    font: {color: '#ffffff'},
+                    legend: {font: {color: '#ffffff'}}
+                };
+
+                Plotly.newPlot('progressChart', progressData, progressLayout, {responsive: true});
+            }
+
+            // Popularity Chart - show empty state
+            const popularityChartDiv = document.getElementById('popularityChart');
+            popularityChartDiv.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                    <div class="text-6xl mb-4">📈</div>
+                    <p class="text-lg font-semibold mb-2">Статистика будет доступна</p>
+                    <p class="text-sm text-center">После накопления данных о ваших тренировках</p>
+                </div>
+            `;
         }
 
         // Initialize page
