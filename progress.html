@@ -111,6 +111,88 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            .grid.grid-cols-2.md\\:grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid.lg\\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid.md\\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid.md\\:grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid.lg\\:grid-cols-5 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            h3 {
+                font-size: 1.125rem;
+            }
+
+            .text-5xl {
+                font-size: 2rem;
+            }
+
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+
+            .text-xl {
+                font-size: 1.125rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .achievement-badge {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -168,20 +250,20 @@
             <!-- Stats Overview -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
                 <div class="stat-card fade-in">
-                    <div class="text-3xl font-bold text-red-400 mb-2">127</div>
+                    <div class="text-3xl font-bold text-red-400 mb-2" id="totalWorkouts">0</div>
                     <div class="text-sm text-gray-300">Тренировок завершено</div>
                 </div>
                 <div class="stat-card fade-in" style="animation-delay: 0.1s;">
-                    <div class="text-3xl font-bold text-teal-400 mb-2">89%</div>
-                    <div class="text-sm text-gray-300">Целей достигнуто</div>
+                    <div class="text-3xl font-bold text-teal-400 mb-2" id="totalCalories">0</div>
+                    <div class="text-sm text-gray-300">Калорий сожжено</div>
                 </div>
                 <div class="stat-card fade-in" style="animation-delay: 0.2s;">
-                    <div class="text-3xl font-bold text-yellow-400 mb-2">45</div>
-                    <div class="text-sm text-gray-300">Дней подряд</div>
+                    <div class="text-3xl font-bold text-yellow-400 mb-2" id="totalMinutes">0</div>
+                    <div class="text-sm text-gray-300">Минут тренировок</div>
                 </div>
                 <div class="stat-card fade-in" style="animation-delay: 0.3s;">
-                    <div class="text-3xl font-bold text-green-400 mb-2">-8.5</div>
-                    <div class="text-sm text-gray-300">Кг потеряно</div>
+                    <div class="text-3xl font-bold text-green-400 mb-2" id="avgDuration">0</div>
+                    <div class="text-sm text-gray-300">Среднее время (мин)</div>
                 </div>
             </div>
         </div>
@@ -337,8 +419,40 @@
     </footer>
 
     <script>
+        // Load workout data from localStorage
+        function loadWorkoutData() {
+            const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+
+            if (history.length === 0) {
+                // Show empty state
+                document.getElementById('totalWorkouts').textContent = '0';
+                document.getElementById('totalCalories').textContent = '0';
+                document.getElementById('totalMinutes').textContent = '0';
+                document.getElementById('avgDuration').textContent = '0';
+                return;
+            }
+
+            // Calculate statistics
+            const totalWorkouts = history.length;
+            const totalCalories = history.reduce((sum, w) => sum + w.calories, 0);
+            const totalSeconds = history.reduce((sum, w) => sum + w.duration, 0);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const avgDuration = Math.floor(totalMinutes / totalWorkouts);
+
+            // Update UI
+            document.getElementById('totalWorkouts').textContent = totalWorkouts;
+            document.getElementById('totalCalories').textContent = totalCalories;
+            document.getElementById('totalMinutes').textContent = totalMinutes;
+            document.getElementById('avgDuration').textContent = avgDuration;
+
+            // Prepare data for charts
+            return history;
+        }
+
         // Initialize charts
         function initCharts() {
+            const history = loadWorkoutData() || [];
+
             // Weight Progress Chart
             const weightData = [{
                 x: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен'],

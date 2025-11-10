@@ -114,11 +114,16 @@
             width: 100%;
             transition: all 0.3s ease;
         }
-        
+
         .input-field:focus {
             outline: none;
             border-color: #ff6b6b;
             box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .input-field option {
+            background: #1a1a2e;
+            color: white;
         }
         
         .btn-primary {
@@ -136,6 +141,68 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            h1 {
+                font-size: 1.875rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .grid.md\\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 1rem;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+
+            .text-xl {
+                font-size: 1.125rem;
+            }
+
+            .btn-primary {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .input-field {
+                padding: 0.625rem 0.875rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -400,19 +467,84 @@
     </footer>
 
     <script>
+        // Load user data from localStorage
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('eliteFitnessUser') || '{}');
+            const profileData = JSON.parse(localStorage.getItem('eliteFitnessProfile') || '{}');
+
+            // Personal Information
+            if (userData.fullName) {
+                const nameParts = userData.fullName.split(' ');
+                const firstName = nameParts[0] || '';
+                const lastName = nameParts.slice(1).join(' ') || '';
+
+                document.querySelector('input[type="text"]').value = firstName;
+                document.querySelectorAll('input[type="text"]')[1].value = lastName;
+
+                // Update avatar initials
+                const avatar = document.querySelector('.profile-avatar');
+                if (avatar && firstName && lastName) {
+                    avatar.textContent = firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+                }
+
+                // Update header name
+                const headerName = document.querySelector('h1.text-3xl');
+                if (headerName) {
+                    headerName.textContent = userData.fullName;
+                }
+            }
+
+            if (userData.email) {
+                document.querySelector('input[type="email"]').value = userData.email;
+            }
+
+            // Load profile data if exists
+            if (profileData.age) document.querySelector('input[type="number"]').value = profileData.age;
+            if (profileData.gender) document.querySelector('select').value = profileData.gender;
+            if (profileData.height) document.querySelectorAll('input[type="number"]')[1].value = profileData.height;
+            if (profileData.weight) document.querySelectorAll('input[type="number"]')[2].value = profileData.weight;
+            if (profileData.goal) document.querySelectorAll('select')[1].value = profileData.goal;
+            if (profileData.targetWeight) document.querySelectorAll('input[type="number"]')[3].value = profileData.targetWeight;
+            if (profileData.activityLevel) document.querySelectorAll('select')[2].value = profileData.activityLevel;
+            if (profileData.preferredTime) document.querySelectorAll('select')[3].value = profileData.preferredTime;
+        }
+
         function enableEditing() {
             const inputs = document.querySelectorAll('.input-field');
             inputs.forEach(input => {
                 input.removeAttribute('readonly');
                 input.removeAttribute('disabled');
             });
-            
+
             const button = event.target;
             button.textContent = 'Сохранить изменения';
             button.onclick = saveProfile;
         }
-        
+
         function saveProfile() {
+            // Get all input values
+            const firstName = document.querySelector('input[type="text"]').value;
+            const lastName = document.querySelectorAll('input[type="text"]')[1].value;
+            const email = document.querySelector('input[type="email"]').value;
+            const age = document.querySelector('input[type="number"]').value;
+            const gender = document.querySelector('select').value;
+            const height = document.querySelectorAll('input[type="number"]')[1].value;
+            const weight = document.querySelectorAll('input[type="number"]')[2].value;
+
+            // Save to localStorage
+            const userData = JSON.parse(localStorage.getItem('eliteFitnessUser') || '{}');
+            userData.fullName = `${firstName} ${lastName}`;
+            userData.email = email;
+            localStorage.setItem('eliteFitnessUser', JSON.stringify(userData));
+
+            const profileData = {
+                age: age,
+                gender: gender,
+                height: height,
+                weight: weight
+            };
+            localStorage.setItem('eliteFitnessProfile', JSON.stringify(profileData));
+
             const inputs = document.querySelectorAll('.input-field');
             inputs.forEach(input => {
                 input.setAttribute('readonly', true);
@@ -420,15 +552,29 @@
                     input.setAttribute('disabled', true);
                 }
             });
-            
+
             const button = event.target;
             button.textContent = 'Редактировать профиль';
             button.onclick = enableEditing;
-            
+
             alert('Профиль успешно обновлен! ✅');
         }
-        
+
         function updateGoals() {
+            // Get goal values
+            const goal = document.querySelectorAll('select')[1].value;
+            const targetWeight = document.querySelectorAll('input[type="number"]')[3].value;
+            const activityLevel = document.querySelectorAll('select')[2].value;
+            const preferredTime = document.querySelectorAll('select')[3].value;
+
+            // Save to localStorage
+            const profileData = JSON.parse(localStorage.getItem('eliteFitnessProfile') || '{}');
+            profileData.goal = goal;
+            profileData.targetWeight = targetWeight;
+            profileData.activityLevel = activityLevel;
+            profileData.preferredTime = preferredTime;
+            localStorage.setItem('eliteFitnessProfile', JSON.stringify(profileData));
+
             alert('Цели обновлены! Мы подберем новую программу под ваши цели. 🎯');
         }
         
@@ -448,6 +594,9 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Load user data from localStorage
+            loadUserData();
+
             // Add fade-in animation to elements
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -457,14 +606,14 @@
                     }
                 });
             });
-            
+
             document.querySelectorAll('.fade-in').forEach(el => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(20px)';
                 el.style.transition = 'all 0.6s ease-out';
                 observer.observe(el);
             });
-            
+
             // Mobile menu toggle
             document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
                 const mobileMenu = document.querySelector('.mobile-menu');

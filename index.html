@@ -927,6 +927,27 @@
                     }, 300);
                 }
 
+                // Reset all selection buttons to default state
+                // Environment - set 'home' as active
+                document.querySelectorAll('.environment-option').forEach(c => c.classList.remove('active'));
+                document.querySelector('.environment-option[data-value="home"]')?.classList.add('active');
+                workoutState.environment = 'home';
+
+                // Level - set 'beginner' as active
+                document.querySelectorAll('.level-option').forEach(c => c.classList.remove('active'));
+                document.querySelector('.level-option[data-value="beginner"]')?.classList.add('active');
+                workoutState.level = 'beginner';
+
+                // Duration - set '45' as active
+                document.querySelectorAll('.duration-option').forEach(c => c.classList.remove('active'));
+                document.querySelector('.duration-option[data-value="45"]')?.classList.add('active');
+                workoutState.duration = 45;
+
+                // Goal - set 'tone' as active
+                document.querySelectorAll('.goal-option').forEach(c => c.classList.remove('active'));
+                document.querySelector('.goal-option[data-value="tone"]')?.classList.add('active');
+                workoutState.goal = 'tone';
+
                 // Scroll back to planner
                 document.querySelector('.hero-section')?.scrollIntoView({ behavior: 'smooth' });
             }
