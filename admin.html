@@ -368,6 +368,16 @@
         let allUsers = [];
         let allWorkouts = [];
 
+        // Таймаут на случай если Firebase долго грузится
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (!loadingScreen.classList.contains('hidden')) {
+                console.log('Таймаут загрузки - показываем форму входа');
+                loadingScreen.classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }, 3000);
+
         // Admin login function
         async function adminLogin() {
             const email = document.getElementById('adminEmail').value;
