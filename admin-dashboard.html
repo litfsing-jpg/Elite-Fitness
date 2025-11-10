@@ -348,8 +348,19 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
+        // ============================================
+        // EmailJS Configuration
+        // ============================================
+        // Получи ключи на https://www.emailjs.com/
+        // Инструкция: EMAILJS_SETUP.md
+        const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";  // Замени на свой Public Key
+        const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";          // Замени на свой Service ID
+        const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";        // Замени на свой Template ID
+
         // Initialize EmailJS
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
+        if (EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        }
 
         let allUsers = [];
         let allWorkouts = [];
@@ -591,6 +602,14 @@
                 return;
             }
 
+            // Проверяем настройку EmailJS
+            if (EMAILJS_PUBLIC_KEY === "YOUR_EMAILJS_PUBLIC_KEY" ||
+                EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID" ||
+                EMAILJS_TEMPLATE_ID === "YOUR_TEMPLATE_ID") {
+                alert('⚠️ EmailJS не настроен!\n\nОткрой EMAILJS_SETUP.md для инструкции по настройке.\n\nТебе нужно:\n1. Зарегистрироваться на emailjs.com\n2. Получить Public Key, Service ID и Template ID\n3. Вставить их в код admin-dashboard.html');
+                return;
+            }
+
             let targetUsers = allUsers;
 
             if (recipients === 'active') {
@@ -611,10 +630,71 @@
                 });
             }
 
-            if (confirm(`Отправить письмо ${targetUsers.length} пользователям?`)) {
-                alert(`Email-рассылка отправляется ${targetUsers.length} пользователям...\n\nВ реальной версии здесь будет интеграция с EmailJS или SendGrid.`);
-                // TODO: Интеграция с EmailJS
+            // Фильтруем пользователей с email
+            targetUsers = targetUsers.filter(u => u.email && u.email.includes('@'));
+
+            if (targetUsers.length === 0) {
+                alert('Нет пользователей с email для отправки');
+                return;
             }
+
+            if (!confirm(`Отправить письмо ${targetUsers.length} пользователям?`)) {
+                return;
+            }
+
+            // Показываем прогресс
+            let sent = 0;
+            let failed = 0;
+            const progressDiv = document.createElement('div');
+            progressDiv.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.9); color:white; padding:30px; border-radius:15px; z-index:10000; text-align:center;';
+            progressDiv.innerHTML = `
+                <h3 style="margin-bottom:15px;">📧 Отправка писем...</h3>
+                <div id="emailProgress">0 / ${targetUsers.length}</div>
+                <div style="margin-top:10px; color:#4ecdc4;" id="emailStatus">Готовимся...</div>
+            `;
+            document.body.appendChild(progressDiv);
+
+            // Отправляем письма по одному с небольшой задержкой (чтобы не превысить лимиты)
+            for (let i = 0; i < targetUsers.length; i++) {
+                const user = targetUsers[i];
+
+                document.getElementById('emailStatus').textContent = `Отправка на ${user.email}...`;
+
+                try {
+                    await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        EMAILJS_TEMPLATE_ID,
+                        {
+                            to_email: user.email,
+                            to_name: user.fullName || 'Пользователь',
+                            subject: subject,
+                            message: body
+                        }
+                    );
+                    sent++;
+                } catch (error) {
+                    console.error(`Ошибка отправки на ${user.email}:`, error);
+                    failed++;
+                }
+
+                document.getElementById('emailProgress').textContent = `${sent + failed} / ${targetUsers.length}`;
+
+                // Пауза 1 секунда между письмами (чтобы не превысить лимиты EmailJS)
+                if (i < targetUsers.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+
+            // Показываем результат
+            progressDiv.innerHTML = `
+                <h3 style="color:#4ecdc4; margin-bottom:15px;">✅ Готово!</h3>
+                <div>Отправлено: ${sent}</div>
+                <div style="color:#ff6b6b;">Ошибок: ${failed}</div>
+                <button onclick="this.parentElement.remove()"
+                        style="margin-top:20px; background:linear-gradient(135deg, #ff6b6b, #4ecdc4); border:none; color:white; padding:10px 30px; border-radius:10px; cursor:pointer;">
+                    Закрыть
+                </button>
+            `;
         }
 
         async function sendPushNotification() {
