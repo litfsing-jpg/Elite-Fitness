@@ -132,11 +132,28 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen">
-        <div class="text-center">
-            <div class="spinner mx-auto mb-4"></div>
-            <p class="text-white">Проверка доступа...</p>
+    <!-- Login Form -->
+    <div id="loginForm" class="min-h-screen flex items-center justify-center px-4">
+        <div class="glass-card w-full max-w-md">
+            <h1 class="text-3xl font-bold text-center mb-8">Админ-панель</h1>
+            <form onsubmit="adminLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="loginEmail" required
+                           class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-3 text-white"
+                           placeholder="admin@example.com">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Пароль</label>
+                    <input type="password" id="loginPassword" required
+                           class="w-full bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg px-4 py-3 text-white"
+                           placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary w-full">
+                    Войти
+                </button>
+                <div id="loginError" class="mt-4 text-red-400 text-center text-sm"></div>
+            </form>
         </div>
     </div>
 
@@ -337,23 +354,43 @@
         let allUsers = [];
         let allWorkouts = [];
 
-        // Проверяем авторизацию
+        // Проверяем авторизацию при загрузке
         firebaseAuth.onAuthStateChanged(async (user) => {
             if (!user) {
-                // Не залогинен - редирект на логин
-                window.location.href = 'admin-login.html';
+                // Не залогинен - показываем форму входа
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
                 return;
             }
 
-            // Залогинен - загружаем админку
+            // Залогинен - показываем админку
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+
             const userDataResult = await getUserData(user.uid);
             document.getElementById('adminName').textContent = userDataResult.success ? userDataResult.data.fullName : 'Админ';
 
             await loadDashboardData();
-
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
         });
+
+        // Функция входа
+        async function adminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            errorDiv.textContent = 'Вход...';
+
+            try {
+                await firebaseAuth.signInWithEmailAndPassword(email, password);
+                // После успешного входа onAuthStateChanged автоматически покажет админку
+                errorDiv.textContent = '';
+            } catch (error) {
+                errorDiv.textContent = 'Неверный логин или пароль';
+                console.error('Login error:', error);
+            }
+        }
 
         async function loadDashboardData() {
             try {
