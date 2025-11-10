@@ -632,57 +632,62 @@
             goal: 'tone'
         };
 
-        // Exercise image mapping
-        function getExerciseImage(exerciseName) {
-            const imageMap = {
-                // Приседания
-                'Приседания': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
-                'Одноногие приседания': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
-                'Выпрыгивания из приседа': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
-                'Приседания с выпрыгиванием': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
-                'Приседания с гантелями': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop',
+        // Exercise icon mapping with colorful gradients
+        function getExerciseIcon(exerciseName) {
+            const name = exerciseName.toLowerCase();
 
-                // Отжимания
-                'Отжимания': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
-                'Отжимания от пола': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
-                'Отжимания с хлопком': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
-                'Отжимания с гантелями': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop',
-                'Обратные отжимания': 'https://images.unsplash.com/photo-1581009146145-b5c25f1e5c7f?w=400&h=400&fit=crop',
+            // Приседания (Squats) - Blue gradient
+            if (name.includes('приседания') || name.includes('приседа') || name.includes('squat') || name.includes('pistol')) {
+                return { emoji: '🦵', gradient: 'from-blue-500 to-blue-700' };
+            }
 
-                // Выпады
-                'Выпады': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
-                'Выпады с гантелями': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
-                'Выпады вперед': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
-                'Выпады в сторону': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
+            // Отжимания (Push-ups) - Red gradient
+            if (name.includes('отжимания') || name.includes('отжимание') || name.includes('push')) {
+                return { emoji: '💪', gradient: 'from-red-500 to-red-700' };
+            }
 
-                // Планка
-                'Планка': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
-                'Планка с поднятием ног': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
-                'Планка на одной руке': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
-                'Боковая планка': 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=400&fit=crop',
+            // Выпады (Lunges) - Green gradient
+            if (name.includes('выпад') || name.includes('lunge')) {
+                return { emoji: '🏃', gradient: 'from-green-500 to-green-700' };
+            }
 
-                // Пресс
-                'Скручивания': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
-                'Велосипед': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
-                'Подъем ног': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
-                'Русские скручивания': 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=400&fit=crop',
+            // Планка (Plank) - Purple gradient
+            if (name.includes('планка') || name.includes('plank')) {
+                return { emoji: '🧘', gradient: 'from-purple-500 to-purple-700' };
+            }
 
-                // Другие
-                'Бёрпи': 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=400&h=400&fit=crop',
-                'Горные альпинисты': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=400&fit=crop',
-                'Ягодичный мост': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
-                'Ягодичный мост на одной ноге': 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?w=400&h=400&fit=crop',
-                'Прыжки со скакалкой': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop',
-                'Бег на месте': 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=400&fit=crop',
-                'Жим гантелей': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop',
-                'Тяга гантелей': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop',
-                'Подтягивания': 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=400&h=400&fit=crop',
-                'Становая тяга': 'https://images.unsplash.com/photo-1534368959876-26bf04f2c947?w=400&h=400&fit=crop',
-                'Жим штанги': 'https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400&h=400&fit=crop'
-            };
+            // Бёрпи/Кардио (Burpees/Cardio) - Orange gradient
+            if (name.includes('бёрпи') || name.includes('burpee') || name.includes('альпинист') || name.includes('climber') || name.includes('прыжки') || name.includes('jump') || name.includes('бег')) {
+                return { emoji: '🔥', gradient: 'from-orange-500 to-orange-700' };
+            }
 
-            // Возвращаем изображение для упражнения или дефолтное
-            return imageMap[exerciseName] || 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop';
+            // Ягодичный мост (Glute bridge) - Teal gradient
+            if (name.includes('ягодичный') || name.includes('мост') || name.includes('bridge')) {
+                return { emoji: '🍑', gradient: 'from-teal-500 to-teal-700' };
+            }
+
+            // Скручивания/Пресс (Abs) - Pink gradient
+            if (name.includes('скручивания') || name.includes('велосипед') || name.includes('bicycle') || name.includes('crunch') || name.includes('подъем ног') || name.includes('русск')) {
+                return { emoji: '🔄', gradient: 'from-pink-500 to-pink-700' };
+            }
+
+            // Подтягивания (Pull-ups) - Indigo gradient
+            if (name.includes('подтягивания') || name.includes('pull')) {
+                return { emoji: '💪', gradient: 'from-indigo-500 to-indigo-700' };
+            }
+
+            // Гантели/Штанга (Weights) - Yellow gradient
+            if (name.includes('гантел') || name.includes('штанг') || name.includes('жим') || name.includes('тяга') || name.includes('dumbbell') || name.includes('barbell') || name.includes('становая')) {
+                return { emoji: '🏋️', gradient: 'from-yellow-500 to-yellow-700' };
+            }
+
+            // Скакалка (Jump rope) - Cyan gradient
+            if (name.includes('скакалк') || name.includes('rope')) {
+                return { emoji: '🪢', gradient: 'from-cyan-500 to-cyan-700' };
+            }
+
+            // Default - Gray gradient
+            return { emoji: '💪', gradient: 'from-gray-500 to-gray-700' };
         }
 
         // Enhanced exercise database with more exercises
@@ -1135,11 +1140,11 @@
                     <p class="text-sm">${exercise.description}</p>
                 `;
             } else {
-                const imgUrl = getExerciseImage(exercise.name);
+                const icon = getExerciseIcon(exercise.name);
                 div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="${imgUrl}" alt="${exercise.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop'">
+                        <div class="w-16 h-16 rounded-lg flex-shrink-0 bg-gradient-to-br ${icon.gradient} flex items-center justify-center text-3xl shadow-lg">
+                            ${icon.emoji}
                         </div>
                         <div class="flex-1 min-w-0">
                             <h3 class="text-base font-bold mb-1 leading-tight">${exercise.name}</h3>
