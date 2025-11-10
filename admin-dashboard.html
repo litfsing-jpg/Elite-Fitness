@@ -351,16 +351,12 @@
         // ============================================
         // EmailJS Configuration
         // ============================================
-        // Получи ключи на https://www.emailjs.com/
-        // Инструкция: EMAILJS_SETUP.md
-        const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";  // Замени на свой Public Key
-        const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";          // Замени на свой Service ID
-        const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";        // Замени на свой Template ID
+        const EMAILJS_PUBLIC_KEY = "2Q9wTW08Fnqha_Z35";
+        const EMAILJS_SERVICE_ID = "service_brzpmyu";
+        const EMAILJS_TEMPLATE_ID = "template_ic1z0uf";
 
         // Initialize EmailJS
-        if (EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-        }
+        emailjs.init(EMAILJS_PUBLIC_KEY);
 
         let allUsers = [];
         let allWorkouts = [];
